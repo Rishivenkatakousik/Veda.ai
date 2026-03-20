@@ -11,6 +11,7 @@ const envSchema = z.object({
   MONGODB_URI: z.string().url(),
   REDIS_URL: z.string().url(),
   AI_PROVIDER: z.enum(["openai", "claude"]).default("openai"),
+  AI_MODEL: z.string().min(1).default("gpt-4o"),
   OPENAI_API_KEY: z.string().optional(),
   CLAUDE_API_KEY: z.string().optional(),
   BULLMQ_PREFIX: z.string().min(1).default("vedaai"),

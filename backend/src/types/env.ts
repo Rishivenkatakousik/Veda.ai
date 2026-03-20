@@ -5,6 +5,7 @@ export type AppEnv = {
   MONGODB_URI: string;
   REDIS_URL: string;
   AI_PROVIDER: "openai" | "claude";
+  AI_MODEL: string;
   OPENAI_API_KEY?: string;
   CLAUDE_API_KEY?: string;
   BULLMQ_PREFIX: string;
