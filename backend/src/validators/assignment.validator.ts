@@ -1,0 +1,66 @@
+import { z } from "zod";
+import { ASSIGNMENT_STATUSES } from "../types/assignment";
+
+const objectIdSchema = z.string().regex(/^[a-fA-F0-9]{24}$/, "Invalid assignment id");
+
+const questionConfigSchema = z.object({
+  type: z.string().trim().min(1, "Question type is required"),
+  count: z.coerce.number().int().positive("Question count must be > 0"),
+  marks: z.coerce.number().int().positive("Question marks must be > 0")
+});
+
+const allowedSortFields = [
+  "createdAt",
+  "-createdAt",
+  "assignedOn",
+  "-assignedOn",
+  "dueDate",
+  "-dueDate"
+] as const;
+
+export const createAssignmentSchema = z.object({
+  params: z.object({}),
+  query: z.object({}),
+  body: z
+    .object({
+      title: z.string().trim().min(3).max(120),
+      subject: z.string().trim().min(2).max(80),
+      className: z.string().trim().min(1).max(40),
+      schoolName: z.string().trim().min(2).max(120),
+      assignedOn: z.coerce.date().optional(),
+      dueDate: z.coerce.date(),
+      questionConfig: z.array(questionConfigSchema).min(1),
+      instructions: z.string().trim().max(4000).optional().default(""),
+      materialFiles: z.array(z.string().trim().min(1)).optional().default([]),
+      createdBy: z.string().trim().min(2).max(80)
+    })
+    .superRefine((body, ctx) => {
+      if (body.dueDate < new Date()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Due date cannot be in the past",
+          path: ["dueDate"]
+        });
+      }
+    })
+});
+
+export const listAssignmentsSchema = z.object({
+  params: z.object({}),
+  body: z.object({}),
+  query: z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(10),
+    search: z.string().trim().max(120).optional(),
+    status: z.enum(ASSIGNMENT_STATUSES).optional(),
+    sort: z.enum(allowedSortFields).default("-createdAt")
+  })
+});
+
+export const regenerateAssignmentSchema = z.object({
+  body: z.object({}),
+  query: z.object({}),
+  params: z.object({
+    id: objectIdSchema
+  })
+});
