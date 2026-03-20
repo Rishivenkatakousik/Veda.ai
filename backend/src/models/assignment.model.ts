@@ -1,4 +1,4 @@
-import { Schema, model, type InferSchemaType } from "mongoose";
+import { Schema, model, type HydratedDocument, type InferSchemaType } from "mongoose";
 import { ASSIGNMENT_STATUSES } from "../types/assignment";
 
 const questionConfigSchema = new Schema(
@@ -87,5 +87,7 @@ assignmentSchema.index({ createdAt: -1 });
 assignmentSchema.index({ assignedOn: -1 });
 assignmentSchema.index({ title: "text", subject: "text" });
 
-export type AssignmentDocument = InferSchemaType<typeof assignmentSchema>;
+export type AssignmentDocument = HydratedDocument<
+  InferSchemaType<typeof assignmentSchema>
+>;
 export const AssignmentModel = model("Assignment", assignmentSchema);

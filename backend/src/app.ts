@@ -4,6 +4,7 @@ import multer from "multer";
 import { env } from "./config/env";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import { notFoundMiddleware } from "./middlewares/notFound.middleware";
+import { assignmentRouter } from "./routes/assignment.routes";
 import { healthRouter } from "./routes/health.routes";
 
 export const app = express();
@@ -34,6 +35,7 @@ app.get("/", (_req, res) => {
 });
 
 app.use(`${env.API_PREFIX}/health`, healthRouter);
+app.use(`${env.API_PREFIX}/assignments`, assignmentRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

@@ -64,3 +64,11 @@ export const regenerateAssignmentSchema = z.object({
     id: objectIdSchema
   })
 });
+
+export const assignmentByIdSchema = z.object({
+  body: z.object({}),
+  query: z.object({}),
+  params: z.object({
+    id: objectIdSchema
+  })
+});
