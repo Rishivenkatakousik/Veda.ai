@@ -10,7 +10,8 @@
     "start": "node dist/server.js",
     "start:worker": "node dist/worker.js",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"No tests configured yet\""
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -22,10 +23,12 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.3.1",
     "ioredis": "^5.10.1",
     "mongoose": "^9.3.1",
     "multer": "^2.1.1",
     "openai": "^6.32.0",
+    "pdfkit": "^0.18.0",
     "socket.io": "^4.8.3",
     "zod": "^4.3.6"
   },
@@ -34,7 +37,9 @@
     "@types/express": "^5.0.6",
     "@types/multer": "^2.1.0",
     "@types/node": "^25.5.0",
+    "@types/pdfkit": "^0.17.5",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   }
 }

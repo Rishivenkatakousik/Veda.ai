@@ -4,7 +4,7 @@ import { env } from "./config/env";
 import { connectMongo, disconnectMongo } from "./config/mongodb";
 import { closeQueue } from "./config/queue";
 import { closeRedis } from "./config/redis";
-import { initializeSocket } from "./websocket/socket";
+import { closeSocket, initializeSocket } from "./websocket/socket";
 
 const startServer = async (): Promise<void> => {
   await connectMongo();
@@ -21,7 +21,12 @@ const startServer = async (): Promise<void> => {
   const shutdown = async (): Promise<void> => {
     console.info("[server] graceful shutdown started");
     httpServer.close(async () => {
-      await Promise.all([closeQueue(), closeRedis(), disconnectMongo()]);
+      await Promise.all([
+        closeSocket(),
+        closeQueue(),
+        closeRedis(),
+        disconnectMongo()
+      ]);
       console.info("[server] shutdown complete");
       process.exit(0);
     });

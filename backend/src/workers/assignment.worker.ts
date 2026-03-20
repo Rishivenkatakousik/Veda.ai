@@ -3,6 +3,7 @@ import { env } from "../config/env";
 import { AssignmentModel } from "../models/assignment.model";
 import { extractJSON, generateFromAI } from "../services/ai.service";
 import { buildSystemPrompt, buildUserPrompt } from "../services/prompt.service";
+import { publishStatusChange } from "../services/realtime.service";
 import { generatedPaperSchema } from "../validators/generated-paper.validator";
 
 type JobPayload = { assignmentId: string };
@@ -25,6 +26,7 @@ const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
 
   assignment.status = "processing";
   await assignment.save();
+  await publishStatusChange(assignmentId, "processing");
   console.info(`${logPrefix} status → processing`);
 
   const systemPrompt = buildSystemPrompt();
@@ -74,6 +76,7 @@ const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
   assignment.answerKey = paper.answerKey;
   assignment.status = "completed";
   await assignment.save();
+  await publishStatusChange(assignmentId, "completed");
 
   console.info(`${logPrefix} status → completed (${paper.sections.length} sections)`);
 };
@@ -127,6 +130,7 @@ const markFailed = async (
     answerKey: `Generation failed: ${reason.slice(0, 500)}`
   });
 
+  await publishStatusChange(assignmentId, "failed");
   console.info(
     `[worker] assignment=${assignmentId} status → failed`
   );

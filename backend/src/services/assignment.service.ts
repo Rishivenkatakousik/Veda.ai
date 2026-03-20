@@ -106,6 +106,31 @@ export const createAssignment = async (
   };
 };
 
+export const regenerateAssignment = async (
+  id: string
+): Promise<{ assignment: AssignmentDocument; jobId: string } | null> => {
+  const assignment = await AssignmentModel.findOne({ _id: id, isDeleted: false });
+  if (!assignment) return null;
+
+  assignment.status = "queued";
+  assignment.set("generatedPaper", undefined);
+  assignment.answerKey = "";
+  assignment.pdfUrl = "";
+  await assignment.save();
+
+  const job = await assignmentQueue.add(
+    "assignment-generate",
+    { assignmentId: assignment._id.toString() },
+    {
+      attempts: 3,
+      backoff: { type: "exponential", delay: 2000 },
+      removeOnComplete: true
+    }
+  );
+
+  return { assignment, jobId: String(job.id) };
+};
+
 export const softDeleteAssignment = async (id: string) => {
   return AssignmentModel.findOneAndUpdate(
     { _id: id, isDeleted: false },

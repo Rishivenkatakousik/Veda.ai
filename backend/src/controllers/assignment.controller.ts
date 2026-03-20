@@ -1,10 +1,14 @@
+import path from "path";
 import type { Request, Response } from "express";
 import {
   createAssignment,
   getAssignmentById,
   listAssignments,
+  regenerateAssignment,
   softDeleteAssignment
 } from "../services/assignment.service";
+import { generatePdf, getPdfPath } from "../services/pdf.service";
+import type { GeneratedPaper } from "../validators/generated-paper.validator";
 
 export const listAssignmentsController = async (
   req: Request,
@@ -96,6 +100,34 @@ export const createAssignmentController = async (
   });
 };
 
+export const regenerateAssignmentController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const result = await regenerateAssignment(String(req.params.id));
+
+  if (!result) {
+    res.status(404).json({
+      success: false,
+      data: null,
+      error: { message: "Assignment not found" },
+      meta: {}
+    });
+    return;
+  }
+
+  res.status(200).json({
+    success: true,
+    data: {
+      assignmentId: result.assignment._id.toString(),
+      status: result.assignment.status,
+      jobId: result.jobId
+    },
+    error: null,
+    meta: {}
+  });
+};
+
 export const deleteAssignmentController = async (
   req: Request,
   res: Response
@@ -118,4 +150,75 @@ export const deleteAssignmentController = async (
     error: null,
     meta: {}
   });
+};
+
+export const generatePdfController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const id = String(req.params.id);
+  const assignment = await getAssignmentById(id);
+
+  if (!assignment) {
+    res.status(404).json({
+      success: false,
+      data: null,
+      error: { message: "Assignment not found" },
+      meta: {}
+    });
+    return;
+  }
+
+  if (assignment.status !== "completed" || !assignment.generatedPaper) {
+    res.status(400).json({
+      success: false,
+      data: null,
+      error: { message: "Assignment has no generated paper yet" },
+      meta: {}
+    });
+    return;
+  }
+
+  const pdfPath = await generatePdf(
+    id,
+    assignment.generatedPaper as unknown as GeneratedPaper
+  );
+
+  res.status(201).json({
+    success: true,
+    data: {
+      assignmentId: id,
+      pdfUrl: `/api/v1/assignments/${id}/pdf`,
+      filePath: path.basename(pdfPath)
+    },
+    error: null,
+    meta: {}
+  });
+};
+
+export const downloadPdfController = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const id = String(req.params.id);
+  const pdfPath = getPdfPath(id);
+
+  if (!pdfPath) {
+    res.status(404).json({
+      success: false,
+      data: null,
+      error: { message: "PDF not found. Generate it first via POST." },
+      meta: {}
+    });
+    return;
+  }
+
+  const assignment = await getAssignmentById(id);
+  const filename = assignment
+    ? `${assignment.title.replace(/[^a-zA-Z0-9 ]/g, "")}.pdf`
+    : `assignment-${id}.pdf`;
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.sendFile(pdfPath);
 };

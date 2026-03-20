@@ -22,7 +22,9 @@ const envSchema = z.object({
   ALLOWED_UPLOAD_MIMES: z
     .string()
     .default("image/jpeg,image/png,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
-  MAX_UPLOAD_FILES: z.coerce.number().int().positive().default(5)
+  MAX_UPLOAD_FILES: z.coerce.number().int().positive().default(5),
+  RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60000),
+  RATE_LIMIT_MAX: z.coerce.number().int().positive().default(100)
 });
 
 const parsed = envSchema.safeParse(process.env);

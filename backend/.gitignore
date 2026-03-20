@@ -22,6 +22,9 @@ pnpm-debug.log*
 # uploaded files
 uploads/
 
+# generated PDFs
+generated-pdfs/
+
 # OS/editor files
 .DS_Store
 Thumbs.db

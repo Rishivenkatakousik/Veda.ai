@@ -15,4 +15,6 @@ export type AppEnv = {
   UPLOAD_DIR: string;
   ALLOWED_UPLOAD_MIMES: string[];
   MAX_UPLOAD_FILES: number;
+  RATE_LIMIT_WINDOW_MS: number;
+  RATE_LIMIT_MAX: number;
 };
