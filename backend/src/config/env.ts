@@ -16,7 +16,12 @@ const envSchema = z.object({
   BULLMQ_PREFIX: z.string().min(1).default("vedaai"),
   QUEUE_NAME: z.string().min(1).default("assignment-generation"),
   CORS_ORIGINS: z.string().default("http://localhost:3000"),
-  MAX_FILE_UPLOAD_SIZE_MB: z.coerce.number().int().positive().default(10)
+  MAX_FILE_UPLOAD_SIZE_MB: z.coerce.number().int().positive().default(10),
+  UPLOAD_DIR: z.string().min(1).default("uploads"),
+  ALLOWED_UPLOAD_MIMES: z
+    .string()
+    .default("image/jpeg,image/png,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+  MAX_UPLOAD_FILES: z.coerce.number().int().positive().default(5)
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -40,5 +45,7 @@ if (values.AI_PROVIDER === "claude" && !values.CLAUDE_API_KEY) {
 
 export const env: AppEnv = {
   ...values,
-  CORS_ORIGINS: values.CORS_ORIGINS.split(",").map((origin) => origin.trim())
+  CORS_ORIGINS: values.CORS_ORIGINS.split(",").map((origin) => origin.trim()),
+  ALLOWED_UPLOAD_MIMES: values.ALLOWED_UPLOAD_MIMES.split(",").map((m) => m.trim()),
+  MAX_UPLOAD_FILES: values.MAX_UPLOAD_FILES
 };

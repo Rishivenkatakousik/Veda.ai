@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { assignmentUpload } from "../config/upload";
 import {
   createAssignmentController,
   deleteAssignmentController,
@@ -16,7 +17,12 @@ const assignmentRouter = Router();
 
 assignmentRouter.get("/", validate(listAssignmentsSchema), listAssignmentsController);
 assignmentRouter.get("/:id", validate(assignmentByIdSchema), getAssignmentController);
-assignmentRouter.post("/", validate(createAssignmentSchema), createAssignmentController);
+assignmentRouter.post(
+  "/",
+  assignmentUpload.array("materialFiles", 5),
+  validate(createAssignmentSchema),
+  createAssignmentController
+);
 assignmentRouter.delete("/:id", validate(assignmentByIdSchema), deleteAssignmentController);
 
 export { assignmentRouter };

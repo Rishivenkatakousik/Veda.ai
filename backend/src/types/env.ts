@@ -11,4 +11,7 @@ export type AppEnv = {
   QUEUE_NAME: string;
   CORS_ORIGINS: string[];
   MAX_FILE_UPLOAD_SIZE_MB: number;
+  UPLOAD_DIR: string;
+  ALLOWED_UPLOAD_MIMES: string[];
+  MAX_UPLOAD_FILES: number;
 };

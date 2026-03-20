@@ -1,6 +1,5 @@
 import cors from "cors";
 import express from "express";
-import multer from "multer";
 import { env } from "./config/env";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import { notFoundMiddleware } from "./middlewares/notFound.middleware";
@@ -17,13 +16,6 @@ app.use(
 );
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
-
-const upload = multer({
-  limits: { fileSize: env.MAX_FILE_UPLOAD_SIZE_MB * 1024 * 1024 }
-});
-
-// Global upload parser for endpoints that need multipart/form-data.
-app.use(upload.any());
 
 app.get("/", (_req, res) => {
   res.status(200).json({

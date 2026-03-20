@@ -62,15 +62,14 @@ export const createAssignmentController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const fileNames =
-    ((req.files as Express.Multer.File[] | undefined) ?? []).map(
-      (file) => file.originalname
-    ) ?? [];
+  const uploadedFiles = (req.files as Express.Multer.File[] | undefined) ?? [];
+  const storedPaths = uploadedFiles.map((file) => file.filename);
 
   const input = req.body as Record<string, unknown>;
-  const fromBody = Array.isArray(input.materialFiles)
-    ? (input.materialFiles as string[])
-    : [];
+
+  const questionConfig = typeof input.questionConfig === "string"
+    ? (JSON.parse(input.questionConfig) as Array<{ type: string; count: number; marks: number }>)
+    : (input.questionConfig as Array<{ type: string; count: number; marks: number }>);
 
   const result = await createAssignment({
     title: String(input.title),
@@ -79,13 +78,9 @@ export const createAssignmentController = async (
     schoolName: String(input.schoolName),
     assignedOn: input.assignedOn ? new Date(String(input.assignedOn)) : undefined,
     dueDate: new Date(String(input.dueDate)),
-    questionConfig: input.questionConfig as Array<{
-      type: string;
-      count: number;
-      marks: number;
-    }>,
+    questionConfig,
     instructions: input.instructions ? String(input.instructions) : "",
-    materialFiles: [...fromBody, ...fileNames],
+    materialFiles: storedPaths,
     createdBy: String(input.createdBy)
   });
 
