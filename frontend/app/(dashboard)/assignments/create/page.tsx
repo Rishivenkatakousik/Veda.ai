@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ export default function CreateAssignmentPage() {
   const store = useCreateAssignmentStore();
 
   const createMutation = useCreateAssignment();
+  const submitLockRef = useRef(false);
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   useEffect(() => {
@@ -53,6 +54,8 @@ export default function CreateAssignmentPage() {
   };
 
   const handleSubmit = async () => {
+    if (submitLockRef.current || createMutation.isPending) return;
+
     const parsed = createAssignmentSchema.safeParse({
       title: store.title,
       subject: store.subject,
@@ -91,20 +94,22 @@ export default function CreateAssignmentPage() {
       formData.append("materialFiles", file);
     }
 
-    createMutation.mutate(formData, {
-      onSuccess: (data) => {
-        toast.success("Assignment created! Generating questions...");
-        reset();
-        router.push(`/assignments/${data.assignmentId}`);
-      },
-      onError: (err) => {
-        toast.error(err.message);
-      },
-    });
+    submitLockRef.current = true;
+    try {
+      const data = await createMutation.mutateAsync(formData);
+      toast.success("Assignment created! Generating questions...");
+      reset();
+      router.push(`/assignments/${data.assignmentId}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      toast.error(message);
+    } finally {
+      submitLockRef.current = false;
+    }
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto px-0 sm:px-1">
       {/* Step indicator */}
       <div className="flex items-center gap-3 mb-8">
         <div className="flex items-center gap-2">

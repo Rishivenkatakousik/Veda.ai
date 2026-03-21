@@ -15,6 +15,8 @@ import toast from "react-hot-toast";
 
 const ACCEPT_STRING = Object.values(ACCEPTED_FILE_TYPES).flat().join(",");
 
+const ALLOWED_MIME_TYPES = new Set(Object.keys(ACCEPTED_FILE_TYPES));
+
 function validateFiles(incoming: File[], existingCount: number): File[] {
   const valid: File[] = [];
 
@@ -23,8 +25,18 @@ function validateFiles(incoming: File[], existingCount: number): File[] {
       toast.error(`Maximum ${MAX_UPLOAD_FILES} files allowed`);
       break;
     }
+    if (!ALLOWED_MIME_TYPES.has(file.type)) {
+      toast.error(
+        `${file.name}: use JPEG, PNG, WebP, PDF, DOC, or DOCX only`,
+      );
+      continue;
+    }
     if (file.size > MAX_FILE_SIZE_BYTES) {
       toast.error(`${file.name} exceeds ${MAX_FILE_SIZE_MB}MB limit`);
+      continue;
+    }
+    if (file.size === 0) {
+      toast.error(`${file.name} is empty`);
       continue;
     }
     valid.push(file);

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, SearchX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AssignmentCard from "./assignment-card";
@@ -67,9 +67,13 @@ export default function AssignmentGrid({
 
       {/* Grid */}
       {assignments.length === 0 ? (
-        <div className="flex flex-col items-center py-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            No assignments match your filters.
+        <div className="flex flex-col items-center py-16 text-center gap-3 px-2">
+          <SearchX className="size-10 text-muted-foreground/60" />
+          <p className="text-sm font-medium text-gray-800">
+            No assignments match your filters
+          </p>
+          <p className="text-xs text-muted-foreground max-w-sm">
+            Try a different search term or clear the status filter.
           </p>
         </div>
       ) : (

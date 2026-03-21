@@ -56,7 +56,7 @@ export default function AssignmentOutput({
       </div>
 
       {/* Action buttons */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <PdfDownloadButton assignmentId={assignment._id} />
         <Button
           variant="outline"
@@ -73,13 +73,14 @@ export default function AssignmentOutput({
         </Button>
       </div>
 
-      {/* Paper container */}
-      <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
-        <div className="max-w-3xl mx-auto px-8 py-10 space-y-6">
+      {/* Paper container — horizontal scroll on small screens */}
+      <div className="rounded-xl border border-border bg-white shadow-sm overflow-hidden max-w-full">
+        <div className="overflow-x-auto">
+          <div className="max-w-3xl min-w-[min(100%,20rem)] mx-auto px-4 sm:px-8 py-8 sm:py-10 space-y-6">
           {/* Header */}
           <div className="text-center space-y-1">
             <h1 className="text-xl font-bold">{paper.header.schoolName}</h1>
-            <div className="flex items-center justify-center gap-4 text-sm text-gray-600">
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-gray-600">
               <span>
                 Subject: <span className="font-medium">{paper.header.subject}</span>
               </span>
@@ -92,7 +93,7 @@ export default function AssignmentOutput({
           <Separator />
 
           {/* Time + Marks */}
-          <div className="flex items-center justify-between text-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
             <span>
               Time Allowed:{" "}
               <span className="font-medium">
@@ -196,6 +197,7 @@ export default function AssignmentOutput({
               </div>
             </>
           )}
+        </div>
         </div>
       </div>
     </div>

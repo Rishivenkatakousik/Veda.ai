@@ -9,6 +9,7 @@ import {
   useRegenerateAssignment,
 } from "@/hooks/use-assignments";
 import { useAssignmentSocket } from "@/hooks/use-socket";
+import { ApiError } from "@/services/api";
 import toast from "react-hot-toast";
 
 export default function AssignmentPage({
@@ -46,17 +47,23 @@ export default function AssignmentPage({
   }
 
   if (error || !assignment) {
+    const isNotFound =
+      error instanceof ApiError && error.status === 404;
+
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+      <div className="flex flex-col items-center justify-center py-24 gap-4 text-center px-4">
         <div className="flex items-center justify-center size-16 rounded-full bg-red-50">
           <AlertTriangle className="size-8 text-red-500" />
         </div>
         <h2 className="text-lg font-semibold text-gray-900">
-          Assignment not found
+          {isNotFound ? "Assignment not found" : "Something went wrong"}
         </h2>
         <p className="text-sm text-muted-foreground max-w-sm">
-          The assignment you&apos;re looking for doesn&apos;t exist or has been
-          deleted.
+          {isNotFound
+            ? "The assignment you’re looking for doesn’t exist or has been deleted."
+            : error instanceof Error
+              ? error.message
+              : "We couldn’t load this assignment. Please try again."}
         </p>
       </div>
     );

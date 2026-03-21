@@ -16,7 +16,7 @@ export default function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 lg:hidden">
+    <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden">
       {/* FAB */}
       <div className="absolute -top-7 left-1/2 -translate-x-1/2">
         <Link
