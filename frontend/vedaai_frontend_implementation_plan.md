@@ -94,7 +94,8 @@ flowchart LR
   end
   ApiService -->|"HTTP REST"| ExpressAPI
   SocketLib -->|"WebSocket"| SocketServer
-  SocketServer -->|"assignment:updated"| SocketLib
+  SocketLib -->|"subscribe:assignment / unsubscribe:assignment"| SocketServer
+  SocketServer -->|"assignment:processing / assignment:completed / assignment:failed"| SocketLib
 ```
 
 ---
@@ -106,10 +107,10 @@ flowchart LR
 **Actions**:
 
 1. Run `npx create-next-app@latest frontend` with TypeScript, Tailwind CSS, App Router, `src/` disabled
-2. Install runtime deps: `@tanstack/react-query zustand socket.io-client zod react-hot-toast lucide-react date-fns jspdf html2canvas`
+2. Install runtime deps: `@tanstack/react-query zustand socket.io-client zod react-hot-toast lucide-react date-fns`
 3. Run `npx shadcn@latest init` (New York style, neutral theme)
 4. Add shadcn components: `button input select calendar popover dropdown-menu dialog badge card separator textarea`
-5. Create `.env.local` with `NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1` and `NEXT_PUBLIC_WS_URL=http://localhost:5000`
+5. Create `.env.local` with `NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1` and `NEXT_PUBLIC_WS_URL=http://localhost:4000`
 6. Verify the app runs with `npm run dev`
 
 **Files created**: `package.json`, `next.config.ts`, `tsconfig.json`, `tailwind.config.ts`, `app/layout.tsx`, `app/globals.css`, `.env.local`, `components/ui/*`
@@ -156,6 +157,9 @@ flowchart LR
    - `getAssignment(id)` -- GET `/assignments/:id`
    - `createAssignment(formData)` -- POST `/assignments` with FormData (multipart)
    - `deleteAssignment(id)` -- DELETE `/assignments/:id`
+   - `regenerateAssignment(id)` -- POST `/assignments/:id/regenerate`
+   - `generatePdf(id)` -- POST `/assignments/:id/pdf` (triggers server-side PDF generation)
+   - `downloadPdfUrl(id)` -- returns the URL string `/assignments/:id/pdf` for direct download via `<a>` tag or `window.open`
 
 2. Create `lib/socket.ts`:
    - Lazy singleton `getSocket()` using `socket.io-client`, connects to `NEXT_PUBLIC_WS_URL`
@@ -185,10 +189,18 @@ flowchart LR
    - `useAssignment(id)` -- `useQuery` wrapping `getAssignment`
    - `useCreateAssignment()` -- `useMutation` wrapping `createAssignment`, invalidates list on success
    - `useDeleteAssignment()` -- `useMutation` wrapping `deleteAssignment`, invalidates list on success
+   - `useRegenerateAssignment()` -- `useMutation` wrapping `regenerateAssignment`, invalidates single assignment query on success
+   - `useGeneratePdf()` -- `useMutation` wrapping `generatePdf`
 
 3. Create `hooks/use-socket.ts`:
-   - Connects on mount, listens for `assignment:updated` event
-   - Accepts a callback; auto-disconnects on unmount
+   - Connects on mount
+   - Emits `subscribe:assignment` with `{ assignmentId }` to join the assignment's room
+   - Listens for three events:
+     - `assignment:processing` -- assignment generation has started
+     - `assignment:completed` -- assignment generation finished (payload includes updated assignment)
+     - `assignment:failed` -- assignment generation failed (payload includes error message)
+   - Emits `unsubscribe:assignment` with `{ assignmentId }` on unmount to leave the room
+   - Auto-disconnects on unmount
 
 **Files created**: `store/create-assignment-store.ts`, `hooks/use-assignments.ts`, `hooks/use-socket.ts`
 
@@ -279,7 +291,7 @@ flowchart LR
 3. Create `components/create-assignment/file-upload.tsx`:
    - Dashed border drop zone
    - Upload icon + "Choose a file or drag & drop it here"
-   - "JPEG, PNG, upto 10MB" hint
+   - "JPEG, PNG, WebP, PDF, DOC, DOCX — up to 10MB" hint
    - "Browse Files" button
    - File preview list after selection
 
@@ -311,11 +323,12 @@ flowchart LR
    - Uses `useAssignment(id)` hook
    - If status is `queued`/`processing`: show loading spinner + "Generating your assignment..." message, listen via `useSocket` for completion
    - If status is `completed`: render `AssignmentOutput` component
-   - If status is `failed`: show error state with retry option
+   - If status is `failed`: show error state with "Regenerate" button (calls `useRegenerateAssignment()`)
 
 2. Create `components/assignments/assignment-output.tsx`:
    - AI chat bubble banner: "Here are customized Question Paper for your CBSE Grade 8 Science classes..."
    - `PdfDownloadButton`
+   - "Regenerate" button -- allows the user to re-generate the paper with the same config (calls `useRegenerateAssignment()`, resets status to `queued` and shows the processing spinner)
    - Paper container (white, shadowed, A4-like proportions):
      - School name centered, Subject + Class right-aligned
      - "Time Allowed" left + "Maximum Marks" right
@@ -327,7 +340,8 @@ flowchart LR
 
 3. Create `components/assignments/pdf-download-button.tsx`:
    - "Download as PDF" button
-   - Uses `html2canvas` + `jsPDF` to capture the paper container and generate a downloadable PDF
+   - Calls `useGeneratePdf()` to trigger server-side PDF generation, then opens `downloadPdfUrl(id)` (backend `GET /assignments/:id/pdf`) in a new tab / triggers download
+   - Shows a loading spinner while the PDF is being generated on the server
 
 **Files created**: `app/(dashboard)/assignments/[id]/page.tsx`, `components/assignments/assignment-output.tsx`, `components/assignments/pdf-download-button.tsx`
 
@@ -371,14 +385,28 @@ flowchart LR
 
 ### Backend API Integration
 
-The backend exposes at `http://localhost:5000/api/v1`:
+The backend exposes at `http://localhost:4000/api/v1`:
 
 - `GET /assignments` -- list with pagination, search, status filter, sort
 - `GET /assignments/:id` -- full assignment with `generatedPaper`
 - `POST /assignments` -- create (multipart, fields: title, subject, className, schoolName, dueDate, questionConfig[], instructions, materialFiles, createdBy)
 - `DELETE /assignments/:id` -- soft delete
+- `POST /assignments/:id/regenerate` -- re-queue assignment for AI generation (resets status to `queued`)
+- `POST /assignments/:id/pdf` -- trigger server-side PDF generation (returns `{ pdfPath }`)
+- `GET /assignments/:id/pdf` -- download the generated PDF file
 
 Response shape: `{ success, data, error, meta }`
+
+### WebSocket Events
+
+The Socket.io server runs on the same port as the API (`NEXT_PUBLIC_WS_URL`). The client should:
+
+1. **Subscribe to an assignment** -- emit `subscribe:assignment` with `{ assignmentId }` to join the assignment's room
+2. **Listen for status changes**:
+   - `assignment:processing` -- worker has picked up the job
+   - `assignment:completed` -- generation finished (payload: `{ assignmentId, status, assignment }`)
+   - `assignment:failed` -- generation failed (payload: `{ assignmentId, status, error }`)
+3. **Unsubscribe** -- emit `unsubscribe:assignment` with `{ assignmentId }` when leaving the page
 
 ### Zustand Store Shape
 
@@ -435,7 +463,6 @@ zod
 react-hot-toast
 lucide-react
 date-fns
-jspdf html2canvas
 ```
 
 Plus shadcn/ui components initialized via `npx shadcn@latest init` and then adding: `button`, `input`, `select`, `calendar`, `popover`, `dropdown-menu`, `dialog`, `badge`, `card`, `separator`, `textarea`.
