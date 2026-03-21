@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { ASSIGNMENT_STATUSES } from "../types/assignment";
 
-const objectIdSchema = z.string().regex(/^[a-fA-F0-9]{24}$/, "Invalid assignment id");
+const objectIdSchema = z.preprocess(
+  (v) => (Array.isArray(v) ? v[0] : v),
+  z.string().regex(/^[a-fA-F0-9]{24}$/, "Invalid assignment id")
+);
 
 const questionConfigSchema = z.object({
   type: z.string().trim().min(1, "Question type is required"),
@@ -17,6 +20,21 @@ const allowedSortFields = [
   "dueDate",
   "-dueDate"
 ] as const;
+
+const listPageSchema = z.preprocess(
+  (val) => (val === undefined || val === "" ? 1 : val),
+  z.coerce.number().int().min(1)
+);
+
+const listLimitSchema = z.preprocess(
+  (val) => (val === undefined || val === "" ? 10 : val),
+  z.coerce.number().int().min(1).max(100)
+);
+
+const listSortSchema = z.preprocess(
+  (val) => (val === undefined || val === "" ? "-createdAt" : val),
+  z.enum(allowedSortFields)
+);
 
 const questionConfigArraySchema = z
   .array(questionConfigSchema)
@@ -71,11 +89,11 @@ export const listAssignmentsSchema = z.object({
   params: z.object({}),
   body: z.object({}),
   query: z.object({
-    page: z.coerce.number().int().min(1).default(1),
-    limit: z.coerce.number().int().min(1).max(100).default(10),
+    page: listPageSchema,
+    limit: listLimitSchema,
     search: z.string().trim().max(120).optional(),
     status: z.enum(ASSIGNMENT_STATUSES).optional(),
-    sort: z.enum(allowedSortFields).default("-createdAt")
+    sort: listSortSchema
   })
 });
 

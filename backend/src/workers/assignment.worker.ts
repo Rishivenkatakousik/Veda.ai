@@ -2,15 +2,19 @@ import { Worker, type Job } from "bullmq";
 import { env } from "../config/env";
 import { AssignmentModel } from "../models/assignment.model";
 import { extractJSON, generateFromAI } from "../services/ai.service";
+import { buildMaterialContext } from "../services/material-context.service";
 import { buildSystemPrompt, buildUserPrompt } from "../services/prompt.service";
 import { publishStatusChange } from "../services/realtime.service";
 import { generatedPaperSchema } from "../validators/generated-paper.validator";
 
-type JobPayload = { assignmentId: string };
+type JobPayload = { assignmentId: string; correlationId?: string };
 
 const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
-  const { assignmentId } = job.data;
-  const logPrefix = `[worker] job=${job.id} assignment=${assignmentId}`;
+  const { assignmentId, correlationId } = job.data;
+  const logPrefix = `[worker] job=${job.id} assignment=${assignmentId}${
+    correlationId ? ` requestId=${correlationId}` : ""
+  }`;
+  const started = Date.now();
 
   console.info(`${logPrefix} started`);
 
@@ -29,6 +33,10 @@ const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
   await publishStatusChange(assignmentId, "processing");
   console.info(`${logPrefix} status → processing`);
 
+  const materialContext = await buildMaterialContext(
+    (assignment.materialFiles ?? []).map((f) => String(f))
+  );
+
   const systemPrompt = buildSystemPrompt();
   const userPrompt = buildUserPrompt({
     title: assignment.title,
@@ -42,7 +50,8 @@ const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
       count: qc.count,
       marks: qc.marks
     })),
-    instructions: assignment.instructions ?? ""
+    instructions: assignment.instructions ?? "",
+    materialContext
   });
 
   console.info(`${logPrefix} calling AI (${env.AI_PROVIDER}/${env.AI_MODEL})`);
@@ -78,7 +87,9 @@ const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
   await assignment.save();
   await publishStatusChange(assignmentId, "completed");
 
-  console.info(`${logPrefix} status → completed (${paper.sections.length} sections)`);
+  console.info(
+    `${logPrefix} status → completed (${paper.sections.length} sections) durationMs=${Date.now() - started}`
+  );
 };
 
 export const createAssignmentWorker = (): Worker<JobPayload> => {
@@ -97,11 +108,13 @@ export const createAssignmentWorker = (): Worker<JobPayload> => {
   worker.on("failed", (job, error) => {
     const jobId = job?.id ?? "unknown";
     const assignmentId = job?.data?.assignmentId ?? "unknown";
+    const correlationId = job?.data?.correlationId;
     const attemptsMade = job?.attemptsMade ?? 0;
     const maxAttempts = job?.opts?.attempts ?? 3;
+    const corr = correlationId ? ` requestId=${correlationId}` : "";
 
     console.error(
-      `[worker] job=${jobId} assignment=${assignmentId} failed (attempt ${attemptsMade}/${maxAttempts}): ${error.message}`
+      `[worker] job=${jobId} assignment=${assignmentId}${corr} failed (attempt ${attemptsMade}/${maxAttempts}): ${error.message}`
     );
 
     if (attemptsMade >= maxAttempts) {

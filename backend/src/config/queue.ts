@@ -11,26 +11,38 @@ export const getQueueHealth = async (): Promise<{
   waiting: number;
   active: number;
   failed: number;
+  delayed: number;
+  paused: number;
+  completed: number;
 }> => {
   try {
-    const [waiting, active, failed] = await Promise.all([
-      assignmentQueue.getWaitingCount(),
-      assignmentQueue.getActiveCount(),
-      assignmentQueue.getFailedCount()
-    ]);
+    const counts = await assignmentQueue.getJobCounts(
+      "waiting",
+      "active",
+      "completed",
+      "failed",
+      "delayed",
+      "paused"
+    );
 
     return {
       status: "up",
-      waiting,
-      active,
-      failed
+      waiting: counts.waiting ?? 0,
+      active: counts.active ?? 0,
+      failed: counts.failed ?? 0,
+      delayed: counts.delayed ?? 0,
+      paused: counts.paused ?? 0,
+      completed: counts.completed ?? 0
     };
   } catch {
     return {
       status: "down",
       waiting: 0,
       active: 0,
-      failed: 0
+      failed: 0,
+      delayed: 0,
+      paused: 0,
+      completed: 0
     };
   }
 };

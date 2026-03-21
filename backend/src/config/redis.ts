@@ -1,10 +1,19 @@
 import Redis from "ioredis";
 import { env } from "./env";
 
-export const redis = new Redis(env.REDIS_URL, {
-  maxRetriesPerRequest: null,
-  enableReadyCheck: true
-});
+/** Shared options for app Redis and standalone pub/sub connections (reconnect backoff). */
+export const standaloneRedisOptions = {
+  maxRetriesPerRequest: null as number | null,
+  enableReadyCheck: true,
+  retryStrategy(times: number): number | null {
+    if (times > 40) {
+      return null;
+    }
+    return Math.min(times * 100, 3000);
+  }
+};
+
+export const redis = new Redis(env.REDIS_URL, standaloneRedisOptions);
 
 redis.on("connect", () => {
   console.info("[redis] connected");

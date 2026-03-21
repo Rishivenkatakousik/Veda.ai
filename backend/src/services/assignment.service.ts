@@ -1,6 +1,7 @@
 import { assignmentQueue } from "../config/queue";
 import { AssignmentModel, type AssignmentDocument } from "../models/assignment.model";
 import type { AssignmentStatus } from "../types/assignment";
+import { publishStatusChange } from "./realtime.service";
 
 type ListAssignmentsInput = {
   page: number;
@@ -21,6 +22,7 @@ type CreateAssignmentInput = {
   instructions?: string;
   materialFiles?: string[];
   createdBy: string;
+  correlationId?: string;
 };
 
 const buildSort = (sort: string): Record<string, 1 | -1> => {
@@ -49,6 +51,7 @@ export const listAssignments = async (input: ListAssignmentsInput) => {
         title: 1,
         subject: 1,
         className: 1,
+        schoolName: 1,
         assignedOn: 1,
         dueDate: 1,
         status: 1,
@@ -92,13 +95,22 @@ export const createAssignment = async (
 
   const job = await assignmentQueue.add(
     "assignment-generate",
-    { assignmentId: assignment._id.toString() },
+    {
+      assignmentId: assignment._id.toString(),
+      correlationId: input.correlationId
+    },
     {
       attempts: 3,
       backoff: { type: "exponential", delay: 2000 },
       removeOnComplete: true
     }
   );
+
+  try {
+    await publishStatusChange(assignment._id.toString(), "queued");
+  } catch (err) {
+    console.error("[assignment] publish queued failed:", err);
+  }
 
   return {
     assignment,
@@ -107,7 +119,8 @@ export const createAssignment = async (
 };
 
 export const regenerateAssignment = async (
-  id: string
+  id: string,
+  options?: { correlationId?: string }
 ): Promise<{ assignment: AssignmentDocument; jobId: string } | null> => {
   const assignment = await AssignmentModel.findOne({ _id: id, isDeleted: false });
   if (!assignment) return null;
@@ -120,13 +133,22 @@ export const regenerateAssignment = async (
 
   const job = await assignmentQueue.add(
     "assignment-generate",
-    { assignmentId: assignment._id.toString() },
+    {
+      assignmentId: assignment._id.toString(),
+      correlationId: options?.correlationId
+    },
     {
       attempts: 3,
       backoff: { type: "exponential", delay: 2000 },
       removeOnComplete: true
     }
   );
+
+  try {
+    await publishStatusChange(assignment._id.toString(), "queued");
+  } catch (err) {
+    console.error("[assignment] publish queued failed:", err);
+  }
 
   return { assignment, jobId: String(job.id) };
 };

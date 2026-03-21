@@ -9,6 +9,8 @@ type PromptInput = {
   totalMarks: number;
   questionConfig: QuestionConfigRow[];
   instructions: string;
+  /** Extracted / summarized text from uploaded materials (optional). */
+  materialContext?: string;
 };
 
 const formatQuestionMatrix = (config: QuestionConfigRow[]): string =>
@@ -79,6 +81,10 @@ export const buildUserPrompt = (input: PromptInput): string => {
 
   if (input.instructions.trim()) {
     lines.push(``, `Additional instructions from the teacher:`, input.instructions);
+  }
+
+  if (input.materialContext?.trim()) {
+    lines.push(``, input.materialContext.trim());
   }
 
   lines.push(

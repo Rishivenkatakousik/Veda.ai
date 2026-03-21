@@ -8,6 +8,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
   API_PREFIX: z.string().min(1).default("/api/v1"),
+  PUBLIC_BASE_URL: z.string().url().optional(),
   MONGODB_URI: z.string().url(),
   REDIS_URL: z.string().url(),
   AI_PROVIDER: z.enum(["openai", "claude"]).default("openai"),

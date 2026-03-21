@@ -1,5 +1,7 @@
 import path from "path";
 import type { Request, Response } from "express";
+import { env } from "../config/env";
+import { AssignmentModel } from "../models/assignment.model";
 import {
   createAssignment,
   getAssignmentById,
@@ -85,7 +87,8 @@ export const createAssignmentController = async (
     questionConfig,
     instructions: input.instructions ? String(input.instructions) : "",
     materialFiles: storedPaths,
-    createdBy: String(input.createdBy)
+    createdBy: String(input.createdBy),
+    correlationId: req.requestId
   });
 
   res.status(201).json({
@@ -104,7 +107,9 @@ export const regenerateAssignmentController = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const result = await regenerateAssignment(String(req.params.id));
+  const result = await regenerateAssignment(String(req.params.id), {
+    correlationId: req.requestId
+  });
 
   if (!result) {
     res.status(404).json({
@@ -184,11 +189,18 @@ export const generatePdfController = async (
     assignment.generatedPaper as unknown as GeneratedPaper
   );
 
+  const pdfPathRel = `${env.API_PREFIX}/assignments/${id}/pdf`;
+  const base = env.PUBLIC_BASE_URL?.replace(/\/$/, "") ?? "";
+  const pdfUrl = base ? `${base}${pdfPathRel}` : pdfPathRel;
+
+  await AssignmentModel.findByIdAndUpdate(id, { pdfUrl });
+
   res.status(201).json({
     success: true,
     data: {
       assignmentId: id,
-      pdfUrl: `/api/v1/assignments/${id}/pdf`,
+      pdfUrl,
+      downloadPath: pdfPathRel,
       filePath: path.basename(pdfPath)
     },
     error: null,

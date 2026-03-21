@@ -74,4 +74,13 @@ describe("buildUserPrompt", () => {
     expect(prompt).toContain("Additional instructions from the teacher:");
     expect(prompt).toContain("Focus on chapter 5");
   });
+
+  it("includes material context when provided", () => {
+    const prompt = buildUserPrompt({
+      ...input,
+      materialContext: "--- Reference materials ---\nUse chapter 3."
+    });
+    expect(prompt).toContain("Reference materials");
+    expect(prompt).toContain("chapter 3");
+  });
 });

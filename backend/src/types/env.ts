@@ -2,6 +2,7 @@ export type AppEnv = {
   NODE_ENV: "development" | "test" | "production";
   PORT: number;
   API_PREFIX: string;
+  PUBLIC_BASE_URL?: string;
   MONGODB_URI: string;
   REDIS_URL: string;
   AI_PROVIDER: "openai" | "claude";

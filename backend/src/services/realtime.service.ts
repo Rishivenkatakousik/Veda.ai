@@ -1,5 +1,6 @@
 import Redis from "ioredis";
 import { env } from "../config/env";
+import { standaloneRedisOptions } from "../config/redis";
 import type { AssignmentStatus } from "../types/assignment";
 
 const CHANNEL = "vedaai:assignment-status";
@@ -19,7 +20,7 @@ let publisher: Redis | null = null;
 
 const getPublisher = (): Redis => {
   if (!publisher) {
-    publisher = new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
+    publisher = new Redis(env.REDIS_URL, standaloneRedisOptions);
   }
   return publisher;
 };
@@ -43,7 +44,7 @@ export const publishStatusChange = async (
 export const subscribeToStatusChanges = (
   handler: (event: AssignmentStatusEvent) => void
 ): Redis => {
-  const subscriber = new Redis(env.REDIS_URL, { maxRetriesPerRequest: null });
+  const subscriber = new Redis(env.REDIS_URL, standaloneRedisOptions);
 
   subscriber.subscribe(CHANNEL).catch((err) => {
     console.error("[realtime] failed to subscribe:", err);

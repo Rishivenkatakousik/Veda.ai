@@ -135,6 +135,15 @@ describe("generatedPaperSchema", () => {
     expect(generatedPaperSchema.safeParse({}).success).toBe(false);
   });
 
+  it("rejects sections that are not an array (malformed AI output)", () => {
+    const result = generatedPaperSchema.safeParse({
+      header: validPaper.header,
+      sections: "Section A only",
+      answerKey: ""
+    });
+    expect(result.success).toBe(false);
+  });
+
   it("rejects missing header", () => {
     const { header: _, ...rest } = validPaper;
     const result = generatedPaperSchema.safeParse(rest);
