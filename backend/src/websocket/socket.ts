@@ -1,7 +1,7 @@
 import type { Server as HttpServer } from "http";
 import type Redis from "ioredis";
 import { Server } from "socket.io";
-import { env } from "../config/env";
+import { expressCorsOptions } from "../config/cors";
 import { subscribeToStatusChanges } from "../services/realtime.service";
 
 let io: Server | null = null;
@@ -9,10 +9,7 @@ let subscriber: Redis | null = null;
 
 export const initializeSocket = (httpServer: HttpServer): Server => {
   io = new Server(httpServer, {
-    cors: {
-      origin: env.CORS_ORIGINS,
-      credentials: true
-    }
+    cors: expressCorsOptions
   });
 
   io.on("connection", (socket) => {

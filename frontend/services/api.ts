@@ -11,7 +11,46 @@ import type {
   RegenerateAssignmentResponse,
 } from "@/types/assignment";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1";
+/**
+ * In the browser during local dev, call the API via Next rewrites (`/api/v1`) so the
+ * request stays same-origin and CORS does not apply. Server-side code talks to BACKEND_URL directly.
+ */
+function shouldUseLocalDevProxy(
+  explicit: string | undefined,
+  pageOrigin: string,
+): boolean {
+  if (!explicit) return true;
+  let apiOrigin: string;
+  try {
+    apiOrigin = new URL(explicit).origin;
+  } catch {
+    return true;
+  }
+  if (apiOrigin === pageOrigin) return false;
+  const localHost =
+    /^(https?:\/\/)(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i;
+  return localHost.test(pageOrigin) && localHost.test(apiOrigin);
+}
+
+function resolveApiBaseUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  if (typeof window !== "undefined") {
+    if (
+      process.env.NODE_ENV === "development" &&
+      shouldUseLocalDevProxy(explicit, window.location.origin)
+    ) {
+      return "/api/v1";
+    }
+    return explicit ?? "/api/v1";
+  }
+
+  const backend =
+    process.env.BACKEND_URL?.replace(/\/$/, "") ?? "http://127.0.0.1:4000";
+  return explicit ?? `${backend}/api/v1`;
+}
+
+const API_URL = resolveApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_URL,
