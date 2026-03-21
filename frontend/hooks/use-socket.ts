@@ -32,7 +32,7 @@ export function useAssignmentSocket(
 
     const socket = getSocket();
 
-    socket.emit("subscribe:assignment", { assignmentId });
+    socket.emit("subscribe:assignment", assignmentId);
 
     const handleProcessing = (data: {
       assignmentId: string;
@@ -71,7 +71,7 @@ export function useAssignmentSocket(
     socket.on("assignment:failed", handleFailed);
 
     return () => {
-      socket.emit("unsubscribe:assignment", { assignmentId });
+      socket.emit("unsubscribe:assignment", assignmentId);
       socket.off("assignment:processing", handleProcessing);
       socket.off("assignment:completed", handleCompleted);
       socket.off("assignment:failed", handleFailed);

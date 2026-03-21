@@ -15,13 +15,31 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
   io.on("connection", (socket) => {
     console.info(`[socket] connected: ${socket.id}`);
 
-    socket.on("subscribe:assignment", (assignmentId: string) => {
-      socket.join(`assignment:${assignmentId}`);
-    });
+    socket.on(
+      "subscribe:assignment",
+      (payload: string | { assignmentId?: string } | undefined) => {
+        const id =
+          typeof payload === "string"
+            ? payload
+            : payload && typeof payload === "object"
+              ? payload.assignmentId
+              : undefined;
+        if (id) socket.join(`assignment:${id}`);
+      }
+    );
 
-    socket.on("unsubscribe:assignment", (assignmentId: string) => {
-      socket.leave(`assignment:${assignmentId}`);
-    });
+    socket.on(
+      "unsubscribe:assignment",
+      (payload: string | { assignmentId?: string } | undefined) => {
+        const id =
+          typeof payload === "string"
+            ? payload
+            : payload && typeof payload === "object"
+              ? payload.assignmentId
+              : undefined;
+        if (id) socket.leave(`assignment:${id}`);
+      }
+    );
 
     socket.on("disconnect", () => {
       console.info(`[socket] disconnected: ${socket.id}`);

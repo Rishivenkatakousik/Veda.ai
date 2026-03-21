@@ -8,7 +8,8 @@ type ListAssignmentsInput = {
   limit: number;
   search?: string;
   status?: AssignmentStatus;
-  sort: string;
+  /** Defaults to -createdAt when omitted (must match listAssignmentsSchema). */
+  sort?: string;
 };
 
 type CreateAssignmentInput = {
@@ -31,7 +32,14 @@ const buildSort = (sort: string): Record<string, 1 | -1> => {
 };
 
 export const listAssignments = async (input: ListAssignmentsInput) => {
-  const { page, limit, search, status, sort } = input;
+  const { search, status } = input;
+  const page =
+    Number.isFinite(input.page) && input.page > 0 ? Math.floor(input.page) : 1;
+  const limit =
+    Number.isFinite(input.limit) && input.limit > 0
+      ? Math.min(100, Math.floor(input.limit))
+      : 10;
+  const sort = input.sort ?? "-createdAt";
   const filter: Record<string, unknown> = { isDeleted: false };
 
   if (status) {
