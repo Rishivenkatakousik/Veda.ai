@@ -1,63 +1,30 @@
-import Anthropic from "@anthropic-ai/sdk";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { env } from "../config/env";
 
 type AiResponse = { raw: string };
-
-const callOpenAI = async (
-  systemPrompt: string,
-  userPrompt: string
-): Promise<AiResponse> => {
-  const client = new OpenAI({ apiKey: env.OPENAI_API_KEY });
-
-  const completion = await client.chat.completions.create({
-    model: env.AI_MODEL,
-    temperature: 0.4,
-    response_format: { type: "json_object" },
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt }
-    ]
-  });
-
-  const content = completion.choices[0]?.message?.content;
-  if (!content) {
-    throw new Error("OpenAI returned an empty response");
-  }
-
-  return { raw: content };
-};
-
-const callClaude = async (
-  systemPrompt: string,
-  userPrompt: string
-): Promise<AiResponse> => {
-  const client = new Anthropic({ apiKey: env.CLAUDE_API_KEY });
-
-  const message = await client.messages.create({
-    model: env.AI_MODEL,
-    max_tokens: 8192,
-    temperature: 0.4,
-    system: systemPrompt,
-    messages: [{ role: "user", content: userPrompt }]
-  });
-
-  const block = message.content[0];
-  if (!block || block.type !== "text") {
-    throw new Error("Claude returned an empty response");
-  }
-
-  return { raw: block.text };
-};
 
 export const generateFromAI = async (
   systemPrompt: string,
   userPrompt: string
 ): Promise<AiResponse> => {
-  if (env.AI_PROVIDER === "claude") {
-    return callClaude(systemPrompt, userPrompt);
+  const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: env.AI_MODEL,
+    systemInstruction: systemPrompt,
+    generationConfig: {
+      temperature: 0.4,
+      maxOutputTokens: 8192,
+      responseMimeType: "application/json"
+    }
+  });
+
+  const result = await model.generateContent(userPrompt);
+  const text = result.response.text();
+  if (!text?.trim()) {
+    throw new Error("Gemini returned an empty response");
   }
-  return callOpenAI(systemPrompt, userPrompt);
+
+  return { raw: text };
 };
 
 export { extractJSON } from "../lib/json-utils";

@@ -11,10 +11,8 @@ const envSchema = z.object({
   PUBLIC_BASE_URL: z.string().url().optional(),
   MONGODB_URI: z.string().url(),
   REDIS_URL: z.string().url(),
-  AI_PROVIDER: z.enum(["openai", "claude"]).default("openai"),
-  AI_MODEL: z.string().min(1).default("gpt-4o"),
-  OPENAI_API_KEY: z.string().optional(),
-  CLAUDE_API_KEY: z.string().optional(),
+  AI_MODEL: z.string().min(1).default("gemini-2.0-flash"),
+  GEMINI_API_KEY: z.string().min(1),
   BULLMQ_PREFIX: z.string().min(1).default("vedaai"),
   QUEUE_NAME: z.string().min(1).default("assignment-generation"),
   CORS_ORIGINS: z.string().default("http://localhost:3000"),
@@ -38,14 +36,6 @@ if (!parsed.success) {
 }
 
 const values = parsed.data;
-
-if (values.AI_PROVIDER === "openai" && !values.OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY is required when AI_PROVIDER=openai");
-}
-
-if (values.AI_PROVIDER === "claude" && !values.CLAUDE_API_KEY) {
-  throw new Error("CLAUDE_API_KEY is required when AI_PROVIDER=claude");
-}
 
 export const env: AppEnv = {
   ...values,

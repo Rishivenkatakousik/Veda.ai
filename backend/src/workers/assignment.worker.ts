@@ -54,7 +54,7 @@ const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
     materialContext
   });
 
-  console.info(`${logPrefix} calling AI (${env.AI_PROVIDER}/${env.AI_MODEL})`);
+  console.info(`${logPrefix} calling AI (gemini/${env.AI_MODEL})`);
   const aiResponse = await generateFromAI(systemPrompt, userPrompt);
 
   const jsonStr = extractJSON(aiResponse.raw);
