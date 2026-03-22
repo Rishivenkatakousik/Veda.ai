@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MoreVertical } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -66,15 +66,14 @@ export default function AssignmentCard({ assignment }: AssignmentCardProps) {
           </h3>
 
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                className="opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100"
-                aria-label="Actions"
-              >
-                <MoreVertical className="size-4 text-gray-700" strokeWidth={1.75} />
-              </Button>
+            <DropdownMenuTrigger
+              aria-label="Actions"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon-xs" }),
+                "opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100",
+              )}
+            >
+              <MoreVertical className="size-4 text-gray-700" strokeWidth={1.75} />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"

@@ -42,7 +42,7 @@ export default function CreateAssignmentForm({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">
+        <h2 className="text-xl font-bold text-gray-900 sm:text-lg sm:font-semibold">
           Assignment Details
         </h2>
         <p className="mt-1 text-sm text-gray-500">
@@ -132,8 +132,10 @@ export default function CreateAssignmentForm({
           <Popover>
             <PopoverTrigger
               className={cn(
-                "flex h-11 w-full items-center justify-between gap-2 rounded-xl border border-input bg-white px-3 text-sm transition-colors outline-none focus:border-ring focus:ring-2 focus:ring-ring/50",
-                !dueDate && "text-muted-foreground",
+                "flex h-11 w-full items-center justify-between gap-2 rounded-xl border px-3 text-sm transition-colors outline-none focus:border-ring focus:ring-2 focus:ring-ring/50",
+                "border-gray-200/90 bg-gray-200/35 max-sm:border-gray-300/80",
+                "sm:border-input sm:bg-white",
+                dueDate ? "text-gray-900" : "text-muted-foreground max-sm:text-gray-500",
                 errors.dueDate && "border-destructive",
               )}
             >
@@ -157,7 +159,11 @@ export default function CreateAssignmentForm({
         </div>
       </div>
 
-      <div className="border-t border-gray-100 pt-8">
+      <div className="border-t border-gray-200/80 pt-6 sm:border-gray-100 sm:pt-8">
+        <h3 className="mb-4 text-base font-bold text-gray-900 sm:hidden">
+          Question Type
+        </h3>
+
         <div
           className="mb-4 hidden sm:grid sm:grid-cols-[minmax(0,1fr)_2.25rem_auto_auto] sm:items-end sm:gap-4"
           role="presentation"
@@ -174,7 +180,7 @@ export default function CreateAssignmentForm({
           </span>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4 sm:space-y-3">
           {questionConfig.map((config, i) => (
             <QuestionTypeRow
               key={i}
@@ -191,11 +197,11 @@ export default function CreateAssignmentForm({
           </p>
         )}
 
-        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-6 flex w-full flex-col gap-3">
           <Button
             type="button"
             variant="ghost"
-            className="h-auto gap-2.5 rounded-none border-0 bg-transparent px-0 py-1 text-sm font-semibold text-gray-700 shadow-none hover:bg-transparent hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-gray-400/60 focus-visible:ring-offset-2"
+            className="h-auto w-fit min-w-0 gap-2.5 self-start rounded-none border-0 bg-transparent px-0 py-1 text-sm font-semibold text-gray-700 shadow-none hover:bg-transparent hover:text-gray-900 focus-visible:ring-2 focus-visible:ring-gray-400/60 focus-visible:ring-offset-2"
             onClick={addQuestionType}
           >
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-white">
@@ -204,7 +210,7 @@ export default function CreateAssignmentForm({
             Add Question Type
           </Button>
 
-          <div className="flex flex-col items-end gap-1 text-sm font-medium text-gray-900 sm:text-right">
+          <div className="flex w-full flex-col items-end gap-1 text-right text-sm font-medium text-gray-900">
             <span>Total Questions : {totalQuestions}</span>
             <span>Total Marks : {totalMarks}</span>
           </div>

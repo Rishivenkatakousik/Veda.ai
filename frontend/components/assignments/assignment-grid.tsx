@@ -25,8 +25,8 @@ export default function AssignmentGrid({
   onStatusFilterChange,
 }: AssignmentGridProps) {
   return (
-    <>
-      <div className="space-y-4 pb-8 sm:space-y-6 lg:pb-10">
+    <div className="flex flex-1 flex-col lg:min-h-[calc(100dvh-7rem)]">
+      <div className="flex min-h-0 flex-1 flex-col space-y-4 pb-8 sm:space-y-6 lg:pb-0">
         {/* Page header — desktop only; mobile title lives in the shell header */}
         <div className="hidden lg:block">
           <div className="mb-1.5 flex items-center gap-3">
@@ -111,17 +111,17 @@ export default function AssignmentGrid({
         )}
       </div>
 
-      <div className="sticky bottom-0 z-20 hidden justify-center pt-4 lg:flex">
+      <div className="mt-auto hidden shrink-0 justify-center pt-4 pb-4 lg:flex lg:pb-10">
         <Link href="/assignments/create">
           <Button
             size="lg"
-            className="h-10 gap-2 rounded-full bg-neutral-900 px-6 mb-4 text-sm text-white hover:bg-neutral-800 font-medium shadow-md shadow-black/10"
+            className="mb-0 h-10 gap-2 rounded-full bg-neutral-900 px-6 text-sm font-medium text-white shadow-md shadow-black/10 hover:bg-neutral-800"
           >
             <Plus className="size-4" strokeWidth={2.5} />
             Create Assignment
           </Button>
         </Link>
       </div>
-    </>
+    </div>
   );
 }

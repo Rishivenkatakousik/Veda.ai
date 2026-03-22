@@ -83,37 +83,51 @@ export default function CreateAssignmentPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-0 sm:px-1">
-      <div className="mb-6 flex items-center gap-3 sm:mb-8">
-        <span
-          className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-green-500/20"
-          aria-hidden
-        >
-          <span className="size-2 rounded-full bg-green-500" />
-        </span>
-        <div className="min-w-0">
-          <h1 className="text-xl font-semibold text-gray-900">
-            Create Assignment
-          </h1>
-          <p className="mt-0.5 text-sm text-gray-500">
-            Set up a new assignment for your students
-          </p>
+    <div className="mx-auto w-full max-w-3xl px-4 sm:px-1">
+      <div className="mb-5 sm:mb-8">
+        <div className="relative flex min-h-11 items-center justify-center sm:min-h-0 sm:justify-start">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="absolute left-0 size-10 shrink-0 rounded-full text-gray-800 hover:bg-gray-200/80 sm:hidden"
+            onClick={() => router.push("/assignments")}
+            aria-label="Back to assignments"
+          >
+            <ArrowLeft className="size-5" strokeWidth={2} />
+          </Button>
+          <div className="flex items-center gap-3 sm:w-full sm:justify-start">
+            <span
+              className="hidden size-[22px] shrink-0 sm:flex sm:items-center sm:justify-center sm:rounded-full sm:bg-green-500/20"
+              aria-hidden
+            >
+              <span className="size-2 rounded-full bg-green-500" />
+            </span>
+            <div className="text-center sm:text-left">
+              <h1 className="text-base font-semibold text-gray-900 sm:text-xl">
+                Create Assignment
+              </h1>
+              <p className="mt-0.5 hidden text-sm text-gray-500 sm:block">
+                Set up a new assignment for your students
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="mb-6 h-1 w-full overflow-hidden rounded-full bg-gray-200 sm:mb-8">
-        <div className="h-full w-[40%] rounded-full bg-neutral-900" />
+      <div className="mb-5 h-1 w-full overflow-hidden rounded-full bg-gray-200 sm:mb-8">
+        <div className="h-full w-1/2 rounded-full bg-neutral-800 sm:w-[40%]" />
       </div>
 
-      <div className="rounded-3xl bg-gray-100 p-6 shadow-sm ring-1 ring-gray-200/80 sm:p-8">
+      <div className="rounded-2xl bg-gray-100 p-4 shadow-sm ring-1 ring-gray-200/80 sm:rounded-3xl sm:p-8">
         <CreateAssignmentForm errors={errors} />
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-4 sm:mt-8">
+      <div className="mt-5 flex gap-3 sm:mt-8 sm:items-center sm:justify-between">
         <Button
           type="button"
           variant="outline"
-          className="h-11 gap-2 rounded-full border-gray-300 bg-white px-5 text-sm font-medium hover:bg-gray-50"
+          className="h-11 flex-1 gap-2 rounded-full border-gray-300 bg-white px-4 text-sm font-medium hover:bg-gray-50 sm:h-11 sm:flex-initial sm:px-5"
           onClick={() => router.push("/assignments")}
         >
           <ArrowLeft className="size-4" />
@@ -122,7 +136,7 @@ export default function CreateAssignmentPage() {
 
         <Button
           type="button"
-          className="h-11 gap-2 rounded-full bg-neutral-900 px-6 text-sm font-medium text-white hover:bg-neutral-800"
+          className="h-11 flex-1 gap-2 rounded-full bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800 sm:h-11 sm:flex-initial sm:px-6"
           onClick={handleSubmit}
           disabled={createMutation.isPending}
         >

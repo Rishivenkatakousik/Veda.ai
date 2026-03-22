@@ -80,10 +80,10 @@ export default function FileUpload() {
         onDragLeave={() => setDragActive(false)}
         onDrop={handleDrop}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed p-10 text-center transition-colors",
+          "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed p-8 text-center transition-colors sm:p-10",
           dragActive
-            ? "border-neutral-400 bg-white"
-            : "border-gray-300 bg-white hover:border-gray-400",
+            ? "border-neutral-400 bg-white max-sm:border-neutral-400 max-sm:bg-gray-200/50"
+            : "border-gray-300 bg-white hover:border-gray-400 max-sm:border-gray-300 max-sm:bg-gray-200/35",
         )}
         onClick={() => inputRef.current?.click()}
       >

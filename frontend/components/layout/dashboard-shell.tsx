@@ -29,7 +29,7 @@ export default function DashboardShell({
 
       {/* Navbar and main are siblings — not one shared container (see reference layout) */}
       <div className="flex min-h-0 flex-1 flex-col gap-3 px-3 pt-3 pb-3 sm:gap-4 sm:px-4 sm:pt-4 sm:pb-4 min-w-0 lg:px-0 lg:pt-0 lg:pb-0">
-        <div className="shrink-0 rounded-2xl border border-gray-200/70 bg-white shadow-sm overflow-hidden">
+        <div className="shrink-0 overflow-hidden lg:rounded-2xl lg:border lg:border-gray-200/70 lg:bg-white lg:shadow-sm">
           <Header onOpenMobileNav={() => setMobileNavOpen(true)} />
         </div>
 
