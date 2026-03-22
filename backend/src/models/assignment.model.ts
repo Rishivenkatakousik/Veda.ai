@@ -18,7 +18,8 @@ const generatedQuestionSchema = new Schema(
       enum: ["easy", "moderate", "challenging"],
       default: "moderate"
     },
-    marks: { type: Number, required: true, min: 1 }
+    marks: { type: Number, required: true, min: 1 },
+    options: { type: [String], default: undefined }
   },
   { _id: false }
 );

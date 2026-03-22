@@ -32,6 +32,9 @@ const difficultyColor = (d: string): string => {
   return COLORS.moderate;
 };
 
+const stripLeadingQuestionEnumeration = (text: string): string =>
+  text.replace(/^\d+\.\s*/, "").trim();
+
 export const generatePdf = async (
   assignmentId: string,
   paper: GeneratedPaper
@@ -48,10 +51,9 @@ export const generatePdf = async (
     doc.pipe(stream);
 
     const { header, studentSection, sections, answerKey } = paper;
+    const left = doc.page.margins.left;
     const pageWidth =
-      (doc.page?.width ?? 595.28) -
-      (doc.page?.margins?.left ?? 55) -
-      (doc.page?.margins?.right ?? 55);
+      doc.page.width - doc.page.margins.left - doc.page.margins.right;
 
     doc
       .fontSize(FONT_SIZES.schoolName)
@@ -71,15 +73,18 @@ export const generatePdf = async (
     const timeMarksY = doc.y;
     doc
       .fontSize(FONT_SIZES.body)
-      .text(`Time Allowed: ${header.timeAllowed}`, 55, timeMarksY, {
+      .text(`Time Allowed: ${header.timeAllowed}`, left, timeMarksY, {
         width: pageWidth / 2,
         align: "left"
       });
-    doc.text(`Maximum Marks: ${header.maxMarks}`, 55 + pageWidth / 2, timeMarksY, {
+    doc.text(`Maximum Marks: ${header.maxMarks}`, left + pageWidth / 2, timeMarksY, {
       width: pageWidth / 2,
       align: "right"
     });
 
+    // Explicit x,y on text() leaves doc.x at the start of the last box — reset so
+    // following lines use the full content width from the left margin.
+    doc.x = left;
     doc.moveDown(1);
     doc
       .fontSize(FONT_SIZES.body)
@@ -97,8 +102,8 @@ export const generatePdf = async (
 
     doc.moveDown(1);
     doc
-      .moveTo(55, doc.y)
-      .lineTo(55 + pageWidth, doc.y)
+      .moveTo(left, doc.y)
+      .lineTo(left + pageWidth, doc.y)
       .strokeColor(COLORS.lightGray)
       .stroke();
     doc.moveDown(0.5);
@@ -124,6 +129,7 @@ export const generatePdf = async (
         const prefix = `${qi + 1}. `;
         const diffBadge = `[${q.difficulty}]`;
         const marksSuffix = ` [${q.marks} Mark${q.marks > 1 ? "s" : ""}]`;
+        const stem = stripLeadingQuestionEnumeration(q.text);
 
         doc
           .fontSize(FONT_SIZES.body)
@@ -139,7 +145,17 @@ export const generatePdf = async (
         doc
           .fillColor(COLORS.black)
           .font("Helvetica")
-          .text(` ${q.text}${marksSuffix}`);
+          .text(` ${stem}${marksSuffix}`);
+
+        const opts = q.options;
+        if (opts && opts.length > 0) {
+          doc.moveDown(0.15);
+          doc.fontSize(FONT_SIZES.small).fillColor(COLORS.gray);
+          for (const line of opts) {
+            doc.font("Helvetica").text(line, { indent: 18 });
+          }
+          doc.fillColor(COLORS.black);
+        }
 
         doc.moveDown(0.25);
       });

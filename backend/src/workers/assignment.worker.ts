@@ -5,7 +5,10 @@ import { extractJSON, generateFromAI } from "../services/ai.service";
 import { buildMaterialContext } from "../services/material-context.service";
 import { buildSystemPrompt, buildUserPrompt } from "../services/prompt.service";
 import { publishStatusChange } from "../services/realtime.service";
-import { generatedPaperSchema } from "../validators/generated-paper.validator";
+import {
+  assertMcqOptionsForConfig,
+  generatedPaperSchema
+} from "../validators/generated-paper.validator";
 
 type JobPayload = { assignmentId: string; correlationId?: string };
 
@@ -75,6 +78,14 @@ const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
   }
 
   const paper = validated.data;
+  assertMcqOptionsForConfig(
+    paper,
+    assignment.questionConfig.map((qc) => ({
+      type: String(qc.type),
+      count: qc.count,
+      marks: qc.marks
+    }))
+  );
 
   paper.header.schoolName = paper.header.schoolName || assignment.schoolName;
   paper.header.subject = paper.header.subject || assignment.subject;

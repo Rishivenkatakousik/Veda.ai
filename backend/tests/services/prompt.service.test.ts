@@ -16,6 +16,7 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain('"sections"');
     expect(prompt).toContain('"answerKey"');
     expect(prompt).toContain('"difficulty"');
+    expect(prompt).toContain('"options"');
   });
 
   it("instructs JSON-only response", () => {
@@ -53,6 +54,8 @@ describe("buildUserPrompt", () => {
     expect(prompt).toContain("5 question(s)");
     expect(prompt).toContain("Short Answer");
     expect(prompt).toContain("3 mark(s) each");
+    expect(prompt).toContain('"options"');
+    expect(prompt).toMatch(/one JSON section per line/i);
   });
 
   it("includes total questions and marks", () => {

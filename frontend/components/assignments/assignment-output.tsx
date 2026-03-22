@@ -2,10 +2,10 @@
 
 import { RefreshCw, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import PdfDownloadButton from "./pdf-download-button";
 import { useRegenerateAssignment } from "@/hooks/use-assignments";
+import { stripLeadingQuestionEnumeration } from "@/lib/question-text";
 import type { Assignment } from "@/types/assignment";
 import toast from "react-hot-toast";
 
@@ -157,13 +157,23 @@ export default function AssignmentOutput({
                 <div className="space-y-3">
                   {section.questions.map((q, qIdx) => {
                     const num = questionNumber++;
+                    const stem = stripLeadingQuestionEnumeration(q.text);
                     return (
                       <div key={qIdx} className="flex gap-3">
                         <span className="text-sm font-medium text-gray-500 shrink-0 w-7 text-right">
                           {num}.
                         </span>
                         <div className="flex-1 space-y-1">
-                          <p className="text-sm leading-relaxed">{q.text}</p>
+                          <p className="text-sm leading-relaxed">{stem}</p>
+                          {q.options && q.options.length > 0 && (
+                            <ul className="mt-2 space-y-1.5 pl-1 text-sm text-gray-800">
+                              {q.options.map((opt, oIdx) => (
+                                <li key={oIdx} className="leading-relaxed">
+                                  {opt}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                           <div className="flex items-center gap-2">
                             <span
                               className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${DIFFICULTY_COLORS[q.difficulty] ?? "bg-gray-100 text-gray-600"}`}

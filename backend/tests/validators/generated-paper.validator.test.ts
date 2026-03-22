@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { generatedPaperSchema } from "../../src/validators/generated-paper.validator";
+import {
+  assertMcqOptionsForConfig,
+  generatedPaperSchema,
+  isMcqQuestionType
+} from "../../src/validators/generated-paper.validator";
 
 const validPaper = {
   header: {
@@ -164,5 +168,112 @@ describe("generatedPaperSchema", () => {
     if (result.success) {
       expect(result.data.sections[0].questions[0].marks).toBe(3);
     }
+  });
+
+  it("accepts questions with options array", () => {
+    const result = generatedPaperSchema.safeParse({
+      ...validPaper,
+      sections: [
+        {
+          title: "MCQ",
+          questions: [
+            {
+              text: "What is 2+2?",
+              difficulty: "easy",
+              marks: 1,
+              options: ["A) 3", "B) 4", "C) 5", "D) 6"]
+            }
+          ]
+        }
+      ]
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("isMcqQuestionType", () => {
+  it("detects Multiple Choice from UI", () => {
+    expect(isMcqQuestionType("Multiple Choice")).toBe(true);
+  });
+
+  it("is case-insensitive", () => {
+    expect(isMcqQuestionType("multiple choice")).toBe(true);
+  });
+});
+
+describe("assertMcqOptionsForConfig", () => {
+  const basePaper = {
+    header: validPaper.header,
+    studentSection: validPaper.studentSection,
+    answerKey: "1. B"
+  };
+
+  it("throws when MCQ section lacks options", () => {
+    const paper = generatedPaperSchema.parse({
+      ...basePaper,
+      sections: [
+        {
+          title: "A",
+          instructions: "",
+          questions: [{ text: "Q?", difficulty: "easy", marks: 1 }]
+        }
+      ]
+    });
+    expect(() =>
+      assertMcqOptionsForConfig(paper, [
+        { type: "Multiple Choice", count: 1, marks: 1 }
+      ])
+    ).toThrow(/options/);
+  });
+
+  it("passes when MCQ has four options", () => {
+    const paper = generatedPaperSchema.parse({
+      ...basePaper,
+      sections: [
+        {
+          title: "A",
+          instructions: "",
+          questions: [
+            {
+              text: "Q?",
+              difficulty: "easy",
+              marks: 1,
+              options: ["A) 1", "B) 2", "C) 3", "D) 4"]
+            }
+          ]
+        }
+      ]
+    });
+    expect(() =>
+      assertMcqOptionsForConfig(paper, [
+        { type: "Multiple Choice", count: 1, marks: 1 }
+      ])
+    ).not.toThrow();
+  });
+
+  it("throws when section count mismatches question config", () => {
+    const paper = generatedPaperSchema.parse({
+      ...basePaper,
+      sections: [
+        {
+          title: "A",
+          instructions: "",
+          questions: [
+            {
+              text: "Q?",
+              difficulty: "easy",
+              marks: 1,
+              options: ["A) 1", "B) 2", "C) 3", "D) 4"]
+            }
+          ]
+        }
+      ]
+    });
+    expect(() =>
+      assertMcqOptionsForConfig(paper, [
+        { type: "Multiple Choice", count: 1, marks: 1 },
+        { type: "Short Questions", count: 1, marks: 2 }
+      ])
+    ).toThrow(/section/);
   });
 });
