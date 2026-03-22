@@ -1,12 +1,40 @@
 import { io, type Socket } from "socket.io-client";
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "http://localhost:4000";
+/**
+ * Local dev: connect straight to `NEXT_PUBLIC_BACKEND_ORIGIN` (from `BACKEND_URL` in `next.config.ts`)
+ * so the port always matches API rewrites. Ignore `NEXT_PUBLIC_WS_URL` here — it is easy to set to
+ * the wrong port (e.g. 5000) while the server runs on 4000. Production / preview uses `NEXT_PUBLIC_WS_URL`
+ * or the page origin.
+ */
+function isLocalDevBrowser(): boolean {
+  if (typeof window === "undefined") return false;
+  if (process.env.NODE_ENV !== "development") return false;
+  const h = window.location.hostname;
+  return h === "localhost" || h === "127.0.0.1" || h === "[::1]";
+}
+
+function resolveSocketUrl(): string {
+  if (isLocalDevBrowser()) {
+    const fromNextConfig = process.env.NEXT_PUBLIC_BACKEND_ORIGIN?.trim();
+    if (fromNextConfig) return fromNextConfig;
+    return window.location.origin;
+  }
+
+  const explicit = process.env.NEXT_PUBLIC_WS_URL?.trim();
+  if (explicit) return explicit;
+
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+
+  return process.env.BACKEND_URL?.replace(/\/$/, "") ?? "http://127.0.0.1:4000";
+}
 
 let socket: Socket | null = null;
 
 export function getSocket(): Socket {
   if (!socket) {
-    socket = io(WS_URL, {
+    socket = io(resolveSocketUrl(), {
       autoConnect: false,
       reconnection: true,
       reconnectionAttempts: Infinity,

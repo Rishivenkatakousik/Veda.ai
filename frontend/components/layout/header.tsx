@@ -85,6 +85,7 @@ export default function Header({ onOpenMobileNav }: HeaderProps) {
         </Link>
 
         <div className="flex shrink-0 items-center gap-2">
+          {offlineDot}
           <Button
             variant="ghost"
             size="icon"
@@ -160,6 +161,7 @@ export default function Header({ onOpenMobileNav }: HeaderProps) {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {offlineDot}
           <Button
             variant="ghost"
             size="icon"

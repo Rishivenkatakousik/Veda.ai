@@ -1,15 +1,25 @@
 import type { Server as HttpServer } from "http";
 import type Redis from "ioredis";
 import { Server } from "socket.io";
-import { expressCorsOptions } from "../config/cors";
+import { env } from "../config/env";
 import { subscribeToStatusChanges } from "../services/realtime.service";
 
 let io: Server | null = null;
 let subscriber: Redis | null = null;
 
+/** Engine.IO does not reliably support Express-style `origin(origin, cb)` CORS. */
+const socketIoCors =
+  env.NODE_ENV === "development"
+    ? { origin: true as const, credentials: true, methods: ["GET", "POST"] }
+    : {
+        origin: env.CORS_ORIGINS,
+        credentials: true,
+        methods: ["GET", "POST"]
+      };
+
 export const initializeSocket = (httpServer: HttpServer): Server => {
   io = new Server(httpServer, {
-    cors: expressCorsOptions
+    cors: socketIoCors
   });
 
   io.on("connection", (socket) => {

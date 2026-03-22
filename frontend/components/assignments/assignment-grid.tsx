@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { Filter, Plus, Search, SearchX } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Filter, Search, SearchX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import AssignmentCard from "./assignment-card";
 import type { AssignmentListItem, AssignmentStatus } from "@/types/assignment";
@@ -109,18 +107,6 @@ export default function AssignmentGrid({
             ))}
           </div>
         )}
-      </div>
-
-      <div className="mt-auto hidden shrink-0 justify-center pt-4 pb-4 lg:flex lg:pb-10">
-        <Link href="/assignments/create">
-          <Button
-            size="lg"
-            className="mb-0 h-10 gap-2 rounded-full bg-neutral-900 px-6 text-sm font-medium text-white shadow-md shadow-black/10 hover:bg-neutral-800"
-          >
-            <Plus className="size-4" strokeWidth={2.5} />
-            Create Assignment
-          </Button>
-        </Link>
       </div>
     </div>
   );
