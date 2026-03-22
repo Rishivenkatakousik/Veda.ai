@@ -11,10 +11,6 @@ import type {
   RegenerateAssignmentResponse,
 } from "@/types/assignment";
 
-/**
- * In the browser during local dev, call the API via Next rewrites (`/api/v1`) so the
- * request stays same-origin and CORS does not apply. Server-side code talks to BACKEND_URL directly.
- */
 function shouldUseLocalDevProxy(
   explicit: string | undefined,
   pageOrigin: string,

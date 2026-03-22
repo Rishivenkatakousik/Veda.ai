@@ -27,7 +27,6 @@ export function useAssignment(id: string) {
     queryKey: [ASSIGNMENTS_KEY, id],
     queryFn: () => getAssignment(id),
     enabled: !!id,
-    // Fallback when Socket.IO is misconfigured or disconnected (API + WS on different ports, etc.)
     refetchInterval: (query) => {
       const a = query.state.data;
       if (!a) return false;

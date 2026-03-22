@@ -26,7 +26,6 @@ export interface GeneratedQuestion {
   text: string;
   difficulty: QuestionDifficulty;
   marks: number;
-  /** Present for multiple-choice questions (four or more choices). */
   options?: string[];
 }
 

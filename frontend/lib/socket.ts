@@ -1,11 +1,5 @@
 import { io, type Socket } from "socket.io-client";
 
-/**
- * Local dev: connect straight to `NEXT_PUBLIC_BACKEND_ORIGIN` (from `BACKEND_URL` in `next.config.ts`)
- * so the port always matches API rewrites. Ignore `NEXT_PUBLIC_WS_URL` here — it is easy to set to
- * the wrong port (e.g. 5000) while the server runs on 4000. Production / preview uses `NEXT_PUBLIC_WS_URL`
- * or the page origin.
- */
 function isLocalDevBrowser(): boolean {
   if (typeof window === "undefined") return false;
   if (process.env.NODE_ENV !== "development") return false;

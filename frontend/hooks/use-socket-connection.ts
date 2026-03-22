@@ -3,9 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { getSocket } from "@/lib/socket";
 
-/**
- * Tracks Socket.io connection state for UI indicators (offline / reconnecting).
- */
 export function useSocketConnection() {
   const [connected, setConnected] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);

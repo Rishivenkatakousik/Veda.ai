@@ -13,7 +13,6 @@ function formatDifficultyLabel(d: QuestionDifficulty): string {
   return d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
 }
 
-/** Web: `[Label]` with colored text. PDF uses the same wording in plain black. */
 const DIFFICULTY_TEXT_CLASS: Record<QuestionDifficulty, string> = {
   easy: "text-emerald-600",
   moderate: "text-amber-600",
@@ -77,11 +76,9 @@ export default function AssignmentOutput({
         </div>
       </div>
 
-      {/* Paper — white sheet inside the dark wrapper */}
       <div className="max-w-full overflow-hidden rounded-2xl border border-white/10 bg-white shadow-sm sm:rounded-[20px]">
         <div className="overflow-x-auto">
           <div className="w-full max-w-3xl mx-auto px-6 sm:px-10 py-8 sm:py-10 space-y-6 text-left">
-          {/* Header — centered only here */}
           <div className="text-center space-y-1">
             <h1 className="text-xl font-bold text-gray-900">
               {paper.header.schoolName}
@@ -104,7 +101,6 @@ export default function AssignmentOutput({
 
           <Separator />
 
-          {/* Time + Marks — opposite ends */}
           <div className="flex flex-row flex-wrap items-baseline justify-between gap-x-4 gap-y-2 text-sm text-gray-800">
             <span>
               Time Allowed:{" "}
@@ -124,7 +120,6 @@ export default function AssignmentOutput({
 
           <Separator />
 
-          {/* Student section — stacked lines with fill-in rules */}
           <div className="space-y-3 text-sm text-gray-800">
             <div className="flex items-end gap-2 min-w-0">
               <span className="shrink-0">
@@ -148,7 +143,6 @@ export default function AssignmentOutput({
 
           <Separator />
 
-          {/* Sections */}
           {paper.sections.map((section, sIdx) => {
             let questionNumber =
               paper.sections
@@ -226,7 +220,6 @@ export default function AssignmentOutput({
             End of Question Paper
           </p>
 
-          {/* Answer Key */}
           {paper.answerKey && (
             <>
               <Separator />

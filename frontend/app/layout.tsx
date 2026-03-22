@@ -25,7 +25,10 @@ export default function RootLayout({
       lang="en"
       className={`${bricolageGrotesque.variable} h-full antialiased`}
     >
-      <body className="h-full min-h-0 overflow-hidden font-sans">
+      <body
+        className="h-full min-h-0 overflow-hidden font-sans"
+        suppressHydrationWarning
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

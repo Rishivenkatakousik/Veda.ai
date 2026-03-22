@@ -12,7 +12,6 @@ import { Separator } from "@/components/ui/separator";
 const LOGO_SRC = "/logo%202.png";
 
 interface SidebarNavProps {
-  /** Called when a nav link is clicked (e.g. close mobile drawer) */
   onNavigate?: () => void;
 }
 
@@ -28,7 +27,6 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
         aria-label="VedaAI home"
       >
         <div className="relative size-14 shrink-0 overflow-hidden rounded-xl">
-          {/* PNG includes extra transparent area below the mark; scale from top and clip */}
           <div className="absolute inset-0 origin-top scale-[1.38]">
             <Image
               src={LOGO_SRC}

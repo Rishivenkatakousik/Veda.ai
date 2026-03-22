@@ -126,7 +126,6 @@ export default function FileUpload() {
         Upload images of your preferred document/image
       </p>
 
-      {/* File preview list */}
       {files.length > 0 && (
         <ul className="space-y-2">
           {files.map((file, i) => (

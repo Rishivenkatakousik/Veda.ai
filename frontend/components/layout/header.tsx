@@ -60,7 +60,6 @@ export default function Header({ onOpenMobileNav }: HeaderProps) {
 
   return (
     <>
-      {/* Mobile: floating pill — same on every page */}
       <header className="flex h-auto min-h-0 shrink-0 items-center justify-between gap-2 rounded-full border border-gray-200/80 bg-white px-3 py-2 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.12)] lg:hidden">
         <Link
           href="/assignments"
@@ -136,7 +135,6 @@ export default function Header({ onOpenMobileNav }: HeaderProps) {
         </div>
       </header>
 
-      {/* Desktop */}
       <header
         className={cn(
           "hidden h-15 shrink-0 items-center justify-between gap-2 bg-white px-3 sm:px-5 lg:flex lg:px-6",

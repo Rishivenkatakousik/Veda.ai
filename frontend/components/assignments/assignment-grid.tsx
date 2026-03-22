@@ -25,7 +25,6 @@ export default function AssignmentGrid({
   return (
     <div className="flex flex-1 flex-col lg:min-h-[calc(100dvh-7rem)]">
       <div className="flex min-h-0 flex-1 flex-col space-y-4 pb-8 sm:space-y-6 lg:pb-0">
-        {/* Page header — desktop only; mobile title lives in the shell header */}
         <div className="hidden lg:block">
           <div className="mb-1.5 flex items-center gap-3">
             <span
@@ -45,7 +44,6 @@ export default function AssignmentGrid({
           </div>
         </div>
 
-        {/* Filter + search — mobile: compact row; desktop: filter left, search flush right */}
         <div className="flex flex-row items-center gap-2 rounded-2xl border border-gray-200/90 bg-white px-3 py-2 shadow-sm sm:justify-between sm:gap-4 sm:rounded-full sm:px-5 sm:py-2.5">
           <div className="flex min-w-0 shrink-0 items-center gap-1.5 border-r border-gray-200 pr-2 sm:shrink-0 sm:gap-2 sm:border-r sm:pr-5">
             <Filter
@@ -85,7 +83,6 @@ export default function AssignmentGrid({
           </div>
         </div>
 
-        {/* Grid */}
         {assignments.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-2xl border border-gray-200/70 bg-[#f5f5f5] px-4 py-16 text-center sm:py-20">
             <SearchX
