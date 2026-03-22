@@ -1,17 +1,29 @@
 import type { Server as HttpServer } from "http";
 import type Redis from "ioredis";
 import { Server } from "socket.io";
+import { isCorsOriginAllowed } from "../config/cors";
 import { env } from "../config/env";
 import { subscribeToStatusChanges } from "../services/realtime.service";
 let io: Server | null = null;
 let subscriber: Redis | null = null;
-const socketIoCors = env.NODE_ENV === "development"
-    ? { origin: true as const, credentials: true, methods: ["GET", "POST"] }
-    : {
-        origin: env.CORS_ORIGINS,
-        credentials: true,
-        methods: ["GET", "POST"]
-    };
+const socketIoCors = {
+    origin: (
+        origin: string | undefined,
+        callback: (err: Error | null, ok?: boolean) => void
+    ) => {
+        if (env.NODE_ENV === "development") {
+            callback(null, true);
+            return;
+        }
+        if (isCorsOriginAllowed(origin)) {
+            callback(null, true);
+            return;
+        }
+        callback(new Error(`Socket.IO CORS blocked for origin: ${origin ?? "(none)"}`));
+    },
+    credentials: true,
+    methods: ["GET", "POST"]
+};
 export const initializeSocket = (httpServer: HttpServer): Server => {
     io = new Server(httpServer, {
         cors: socketIoCors
