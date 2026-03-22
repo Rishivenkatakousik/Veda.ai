@@ -1,17 +1,13 @@
-# dependencies
 node_modules/
 
-# build output
 dist/
 coverage/
 *.tsbuildinfo
 
-# environment
 .env
 .env.*
 !.env.example
 
-# logs
 logs/
 *.log
 npm-debug.log*
@@ -19,13 +15,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# uploaded files
 uploads/
 
-# generated PDFs
 generated-pdfs/
 
-# OS/editor files
 .DS_Store
 Thumbs.db
 .idea/
