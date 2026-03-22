@@ -49,17 +49,6 @@ export default function Header({ onOpenMobileNav }: HeaderProps) {
   const isAssignmentsHome = pathname === "/assignments";
   const { connected, reconnecting } = useSocketConnection();
 
-  const offlineChip = (!connected || reconnecting) && (
-    <div
-      className="flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs text-amber-800 border border-amber-200 max-w-[140px] sm:max-w-none"
-      title="Real-time updates may be delayed until reconnected"
-    >
-      <WifiOff className="size-3.5 shrink-0" />
-      <span className="hidden sm:inline">
-        {reconnecting ? "Reconnecting…" : "Offline"}
-      </span>
-    </div>
-  );
 
   const offlineDot =
     !connected || reconnecting ? (
@@ -154,14 +143,11 @@ export default function Header({ onOpenMobileNav }: HeaderProps) {
           )}
 
           <div className="flex min-w-0 items-center gap-2 text-sm">
-            <LayoutGrid className="size-4 shrink-0 stroke-[1.5] text-gray-400 hidden sm:block" />
             <span className="truncate font-medium text-gray-500">{title}</span>
           </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          {offlineChip}
-
           <Button
             variant="ghost"
             size="icon"

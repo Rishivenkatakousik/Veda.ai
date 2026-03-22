@@ -29,16 +29,22 @@ export default function AssignmentGrid({
       <div className="space-y-4 pb-8 sm:space-y-6 lg:pb-10">
         {/* Page header — desktop only; mobile title lives in the shell header */}
         <div className="hidden lg:block">
-          <div className="mb-1.5 flex items-center gap-2">
+          <div className="mb-1.5 flex items-center gap-3">
             <span
-              className="size-2 shrink-0 rounded-full bg-green-500"
+              className="flex size-[16px] shrink-0 items-center justify-center rounded-full bg-green-500/20"
               aria-hidden
-            />
-            <h1 className="text-xl font-semibold text-gray-900">Assignments</h1>
+            >
+              <span className="size-2 rounded-full bg-green-500" />
+            </span>
+            <div className="min-w-0">
+              <h1 className="text-xl font-semibold text-gray-900">
+                Assignments
+              </h1>
+              <p className="mt-0.5 text-sm text-gray-500">
+                Manage and create assignments for your classes.
+              </p>
+            </div>
           </div>
-          <p className="pl-4 text-sm text-gray-500">
-            Manage and create assignments for your classes.
-          </p>
         </div>
 
         {/* Filter + search — mobile: compact row; desktop: filter left, search flush right */}

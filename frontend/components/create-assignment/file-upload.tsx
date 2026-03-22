@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Upload, X, FileIcon } from "lucide-react";
+import { CloudUpload, X, FileIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -80,29 +80,29 @@ export default function FileUpload() {
         onDragLeave={() => setDragActive(false)}
         onDrop={handleDrop}
         className={cn(
-          "flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 text-center transition-colors cursor-pointer",
+          "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed p-10 text-center transition-colors",
           dragActive
-            ? "border-orange-400 bg-orange-50"
-            : "border-gray-300 bg-gray-50 hover:border-gray-400",
+            ? "border-neutral-400 bg-white"
+            : "border-gray-300 bg-white hover:border-gray-400",
         )}
         onClick={() => inputRef.current?.click()}
       >
-        <div className="flex items-center justify-center size-12 rounded-full bg-white border border-gray-200">
-          <Upload className="size-5 text-gray-500" />
+        <div className="flex size-14 items-center justify-center rounded-full border border-gray-200 bg-gray-50">
+          <CloudUpload className="size-7 text-gray-500" strokeWidth={1.5} />
         </div>
         <div>
-          <p className="text-sm font-medium text-gray-700">
+          <p className="text-sm font-medium text-gray-800">
             Choose a file or drag & drop it here
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            JPEG, PNG, WebP, PDF, DOC, DOCX — up to {MAX_FILE_SIZE_MB}MB
+          <p className="mt-1 text-xs text-gray-500">
+            JPEG, PNG, upto {MAX_FILE_SIZE_MB}MB
           </p>
         </div>
         <Button
           type="button"
           variant="outline"
           size="sm"
-          className="rounded-lg"
+          className="rounded-full border-gray-300 px-5"
           onClick={(e) => {
             e.stopPropagation();
             inputRef.current?.click();
@@ -122,6 +122,9 @@ export default function FileUpload() {
           }}
         />
       </div>
+      <p className="text-center text-xs text-gray-500">
+        Upload images of your preferred document/image
+      </p>
 
       {/* File preview list */}
       {files.length > 0 && (
