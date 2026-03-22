@@ -20,20 +20,18 @@ const FONT_SIZES = {
 const COLORS = {
   black: "#000000",
   gray: "#555555",
-  lightGray: "#999999",
-  easy: "#22c55e",
-  moderate: "#f59e0b",
-  challenging: "#ef4444"
+  lightGray: "#999999"
 } as const;
-
-const difficultyColor = (d: string): string => {
-  if (d === "easy") return COLORS.easy;
-  if (d === "challenging") return COLORS.challenging;
-  return COLORS.moderate;
-};
 
 const stripLeadingQuestionEnumeration = (text: string): string =>
   text.replace(/^\d+\.\s*/, "").trim();
+
+/** Plain label for PDF (black text only — no color styling). */
+const formatDifficultyLabel = (difficulty: string): string => {
+  const d = difficulty.trim();
+  if (!d) return difficulty;
+  return d.charAt(0).toUpperCase() + d.slice(1).toLowerCase();
+};
 
 export const generatePdf = async (
   assignmentId: string,
@@ -127,7 +125,6 @@ export const generatePdf = async (
 
       section.questions.forEach((q, qi) => {
         const prefix = `${qi + 1}. `;
-        const diffBadge = `[${q.difficulty}]`;
         const marksSuffix = ` [${q.marks} Mark${q.marks > 1 ? "s" : ""}]`;
         const stem = stripLeadingQuestionEnumeration(q.text);
 
@@ -139,13 +136,10 @@ export const generatePdf = async (
 
         doc
           .font("Helvetica")
-          .fillColor(difficultyColor(q.difficulty))
-          .text(diffBadge, { continued: true });
-
-        doc
           .fillColor(COLORS.black)
-          .font("Helvetica")
-          .text(` ${stem}${marksSuffix}`);
+          .text(`[${formatDifficultyLabel(q.difficulty)}] `, { continued: true });
+
+        doc.text(`${stem}${marksSuffix}`);
 
         const opts = q.options;
         if (opts && opts.length > 0) {

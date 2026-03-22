@@ -26,34 +26,40 @@ export default function AssignmentGrid({
 }: AssignmentGridProps) {
   return (
     <>
-      <div className="space-y-6 pb-8 lg:pb-10">
-        {/* Page header */}
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
+      <div className="space-y-4 pb-8 sm:space-y-6 lg:pb-10">
+        {/* Page header — desktop only; mobile title lives in the shell header */}
+        <div className="hidden lg:block">
+          <div className="mb-1.5 flex items-center gap-2">
             <span
-              className="size-2 rounded-full bg-green-500 shrink-0"
+              className="size-2 shrink-0 rounded-full bg-green-500"
               aria-hidden
             />
             <h1 className="text-xl font-semibold text-gray-900">Assignments</h1>
           </div>
-          <p className="text-sm text-gray-500 pl-4">
+          <p className="pl-4 text-sm text-gray-500">
             Manage and create assignments for your classes.
           </p>
         </div>
 
-        {/* Filter + search — single pill */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-0 rounded-full bg-white border border-gray-200/90 px-4 py-2.5 shadow-sm">
-          <div className="flex items-center gap-2 min-w-0 sm:shrink-0 sm:pr-4 sm:border-r sm:border-gray-200">
-            <Filter className="size-4 text-gray-400 shrink-0" strokeWidth={1.75} />
-            <span className="text-sm text-gray-500 whitespace-nowrap">
+        {/* Filter + search — mobile: compact row; desktop: filter left, search flush right */}
+        <div className="flex flex-row items-center gap-2 rounded-2xl border border-gray-200/90 bg-white px-3 py-2 shadow-sm sm:justify-between sm:gap-4 sm:rounded-full sm:px-5 sm:py-2.5">
+          <div className="flex min-w-0 shrink-0 items-center gap-1.5 border-r border-gray-200 pr-2 sm:shrink-0 sm:gap-2 sm:border-r sm:pr-5">
+            <Filter
+              className="size-4 shrink-0 text-gray-400"
+              strokeWidth={1.75}
+            />
+            <span className="hidden whitespace-nowrap text-sm text-gray-500 sm:inline">
               Filter By
+            </span>
+            <span className="whitespace-nowrap text-sm text-gray-500 sm:hidden">
+              Filter
             </span>
             <select
               value={statusFilter}
               onChange={(e) =>
                 onStatusFilterChange(e.target.value as AssignmentStatus | "")
               }
-              className="min-w-0 flex-1 sm:flex-initial h-9 rounded-lg border-0 bg-gray-50 sm:bg-transparent px-2 text-sm text-gray-800 font-medium outline-none focus:ring-0 cursor-pointer"
+              className="h-9 min-w-0 max-w-30 flex-1 cursor-pointer rounded-lg border-0 bg-transparent px-1 text-sm font-semibold text-gray-800 outline-none focus:ring-0 sm:max-w-none sm:flex-initial sm:bg-gray-50 sm:px-2 lg:bg-transparent"
             >
               <option value="">All Statuses</option>
               {ASSIGNMENT_STATUSES.map((s) => (
@@ -64,25 +70,29 @@ export default function AssignmentGrid({
             </select>
           </div>
 
-          <div className="relative flex-1 min-w-0 sm:pl-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400 pointer-events-none" />
+          <div className="relative min-w-0 flex-1 sm:max-w-md sm:flex-none lg:max-w-lg">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
             <Input
               placeholder="Search Assignment"
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-9 h-10 rounded-full border-0 bg-gray-50 text-sm shadow-none focus-visible:ring-1 focus-visible:ring-gray-300"
+              className="h-10 w-full rounded-full border border-gray-200 bg-white pl-9 text-sm shadow-none focus-visible:ring-1 focus-visible:ring-gray-300 sm:bg-white"
             />
           </div>
         </div>
 
         {/* Grid */}
         {assignments.length === 0 ? (
-          <div className="flex flex-col items-center py-16 text-center gap-3 px-2">
-            <SearchX className="size-10 text-muted-foreground/60" />
-            <p className="text-sm font-medium text-gray-800">
+          <div className="flex flex-col items-center gap-3 rounded-2xl border border-gray-200/70 bg-[#f5f5f5] px-4 py-16 text-center sm:py-20">
+            <SearchX
+              className="size-10 text-muted-foreground/60"
+              strokeWidth={1.75}
+              aria-hidden
+            />
+            <p className="text-sm font-semibold text-gray-900">
               No assignments match your filters
             </p>
-            <p className="text-xs text-muted-foreground max-w-sm">
+            <p className="max-w-sm text-xs text-gray-500 sm:text-sm">
               Try a different search term or clear the status filter.
             </p>
           </div>
@@ -95,7 +105,7 @@ export default function AssignmentGrid({
         )}
       </div>
 
-      <div className="sticky bottom-0 z-20 flex justify-center pt-4">
+      <div className="sticky bottom-0 z-20 hidden justify-center pt-4 lg:flex">
         <Link href="/assignments/create">
           <Button
             size="lg"

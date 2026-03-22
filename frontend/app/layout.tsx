@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
 import Providers from "./providers";
 import "./globals.css";
 
-const inter = Inter({
+const bricolageGrotesque = Bricolage_Grotesque({
   variable: "--font-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +21,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${bricolageGrotesque.variable} h-full antialiased`}
+    >
       <body className="h-full min-h-0 overflow-hidden font-sans">
         <Providers>{children}</Providers>
       </body>

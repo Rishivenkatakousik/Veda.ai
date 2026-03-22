@@ -33,7 +33,7 @@ export default function DashboardShell({
           <Header onOpenMobileNav={() => setMobileNavOpen(true)} />
         </div>
 
-        <main className="scrollbar-hide min-h-0 flex flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain">
+        <main className="scrollbar-hide min-h-0 flex flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain pb-[max(9.5rem,env(safe-area-inset-bottom)+8.5rem)] lg:pb-0">
           {children}
         </main>
       </div>

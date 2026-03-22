@@ -56,10 +56,10 @@ export default function AssignmentCard({ assignment }: AssignmentCardProps) {
 
   return (
     <>
-      <div className="group relative rounded-xl border border-border bg-white p-4 sm:p-5 transition-shadow hover:shadow-md">
-        <div className="flex items-start justify-between gap-3 mb-3">
+      <div className="group relative rounded-2xl border border-gray-200/90 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5 lg:rounded-xl lg:border-border lg:shadow-none">
+        <div className="mb-3 flex items-start justify-between gap-3">
           <h3
-            className="text-base font-semibold text-gray-900 line-clamp-2 sm:line-clamp-1 cursor-pointer hover:text-orange-600 transition-colors"
+            className="line-clamp-2 cursor-pointer text-base font-semibold text-gray-900 transition-colors hover:text-orange-600 sm:line-clamp-1"
             onClick={() => router.push(`/assignments/${assignment._id}`)}
           >
             {assignment.title}
@@ -70,10 +70,10 @@ export default function AssignmentCard({ assignment }: AssignmentCardProps) {
               <Button
                 variant="ghost"
                 size="icon-xs"
-                className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                className="opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100"
                 aria-label="Actions"
               >
-                <MoreVertical className="size-4" />
+                <MoreVertical className="size-4 text-gray-700" strokeWidth={1.75} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -98,23 +98,22 @@ export default function AssignmentCard({ assignment }: AssignmentCardProps) {
           </DropdownMenu>
         </div>
 
-        <div className="space-y-1 text-sm text-muted-foreground mb-4">
-          <p>
-            Assigned on :{" "}
-            <span className="text-gray-700">
+        <div className="mb-4 flex flex-wrap items-baseline gap-x-6 gap-y-1 text-sm">
+          <span className="inline-flex flex-wrap items-baseline gap-1">
+            <span className="font-semibold text-gray-900">Assigned on :</span>
+            <span className="text-gray-500">
               {formatDate(assignment.assignedOn)}
             </span>
-          </p>
-          <p>
-            <span className="font-semibold text-gray-900">Due</span>
-            {" : "}
-            <span className="text-gray-700">
+          </span>
+          <span className="inline-flex flex-wrap items-baseline gap-1">
+            <span className="font-semibold text-gray-900">Due :</span>
+            <span className="text-gray-500">
               {formatDate(assignment.dueDate)}
             </span>
-          </p>
+          </span>
         </div>
 
-        <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <Badge variant={STATUS_VARIANT[assignment.status] ?? "secondary"}>
             {ASSIGNMENT_STATUS_LABELS[assignment.status] ?? assignment.status}
           </Badge>
