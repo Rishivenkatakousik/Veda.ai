@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 type AppError = Error & {
     statusCode?: number;
     details?: unknown;
+    code?: string;
 };
 const MULTER_ERROR_MESSAGES: Record<string, string> = {
     LIMIT_FILE_SIZE: "File size exceeds the allowed limit",

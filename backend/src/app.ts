@@ -1,5 +1,5 @@
 import cors from "cors";
-import express from "express";
+import express, { type Request, type Response } from "express";
 import { expressCorsOptions } from "./config/cors";
 import { env } from "./config/env";
 import { errorMiddleware } from "./middlewares/error.middleware";
@@ -14,7 +14,7 @@ app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLoggerMiddleware);
 app.use(apiLimiter);
-app.get("/", (_req, res) => {
+app.get("/", (_req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         data: { service: "vedaai-backend", version: "1.0.0" },
