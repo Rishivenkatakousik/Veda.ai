@@ -1,9 +1,9 @@
 import {
-  Home,
+  LayoutGrid,
   Users,
   FileText,
-  Sparkles,
-  Library,
+  Tablet,
+  History,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -33,11 +33,11 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { icon: Home, label: "Home", href: "/home" },
+  { icon: LayoutGrid, label: "Home", href: "/home" },
   { icon: Users, label: "My Groups", href: "/groups" },
   { icon: FileText, label: "Assignments", href: "/assignments" },
-  { icon: Sparkles, label: "AI Teacher's Toolkit", href: "/toolkit" },
-  { icon: Library, label: "My Library", href: "/library" },
+  { icon: Tablet, label: "AI Teacher's Toolkit", href: "/toolkit" },
+  { icon: History, label: "My Library", href: "/library" },
 ];
 
 export const SETTINGS_NAV: NavItem = {

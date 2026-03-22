@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MoreVertical, Eye, Trash2 } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -77,19 +76,22 @@ export default function AssignmentCard({ assignment }: AssignmentCardProps) {
                 <MoreVertical className="size-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="bottom">
+            <DropdownMenuContent
+              align="end"
+              side="bottom"
+              className="min-w-45 w-max rounded-xl p-1 shadow-md ring-1 ring-black/5"
+            >
               <DropdownMenuItem
+                className="rounded-lg px-2 py-1.5 text-sm text-gray-900"
                 onClick={() => router.push(`/assignments/${assignment._id}`)}
               >
-                <Eye className="size-4" />
                 View Assignment
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem
                 variant="destructive"
+                className="mt-0.5 rounded-lg bg-gray-100 px-2 py-1.5 text-sm text-destructive hover:bg-gray-200 focus:bg-gray-200 focus:text-destructive dark:bg-gray-100 dark:hover:bg-gray-200 dark:focus:bg-gray-200"
                 onClick={() => setConfirmOpen(true)}
               >
-                <Trash2 className="size-4" />
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -104,7 +106,8 @@ export default function AssignmentCard({ assignment }: AssignmentCardProps) {
             </span>
           </p>
           <p>
-            Due :{" "}
+            <span className="font-semibold text-gray-900">Due</span>
+            {" : "}
             <span className="text-gray-700">
               {formatDate(assignment.dueDate)}
             </span>
