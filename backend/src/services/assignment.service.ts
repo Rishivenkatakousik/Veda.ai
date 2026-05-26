@@ -41,8 +41,9 @@ export const listAssignments = async (input: ListAssignmentsInput) => {
     if (status) {
         filter.status = status;
     }
-    if (search) {
-        filter.$text = { $search: search };
+    if (search && search.trim()) {
+        const escaped = search.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        filter.title = new RegExp(escaped, "i");
     }
     const [items, totalItems] = await Promise.all([
         AssignmentModel.find(filter)

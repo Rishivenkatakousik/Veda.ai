@@ -12,14 +12,14 @@ export default function AssignmentsPage() {
   const [statusFilter, setStatusFilter] = useState<AssignmentStatus | "">("");
   const [page] = useState(1);
 
-  const { data, isLoading, isError } = useAssignments({
+  const { data, isPending, isError } = useAssignments({
     page,
     limit: 20,
     search: search || undefined,
     status: statusFilter || undefined,
   });
 
-  if (isLoading) {
+  if (isPending) {
     return <AssignmentsListSkeleton />;
   }
 

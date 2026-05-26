@@ -2,6 +2,7 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
+  keepPreviousData,
 } from "@tanstack/react-query";
 import {
   listAssignments,
@@ -19,6 +20,7 @@ export function useAssignments(params: ListAssignmentsParams = {}) {
   return useQuery({
     queryKey: [ASSIGNMENTS_KEY, params],
     queryFn: () => listAssignments(params),
+    placeholderData: keepPreviousData,
   });
 }
 
