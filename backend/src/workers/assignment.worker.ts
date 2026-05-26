@@ -27,8 +27,10 @@ const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
     await assignment.save();
     await publishStatusChange(assignmentId, "processing");
     console.info(`${logPrefix} status → processing`);
-    const materialContext = await buildMaterialContext((assignment.materialFiles ?? []).map((f) => String(f)));
-    const systemPrompt = buildSystemPrompt();
+    const { text: materialContext, fileParts } = await buildMaterialContext((assignment.materialFiles ?? []).map((f) => String(f)));
+    const hasMaterialContext = materialContext.trim().length > 0 || fileParts.length > 0;
+    console.info(`${logPrefix} material context: files=${assignment.materialFiles?.length ?? 0} chars=${materialContext.length} inlineParts=${fileParts.length} hasContext=${hasMaterialContext}`);
+    const systemPrompt = buildSystemPrompt(hasMaterialContext);
     const userPrompt = buildUserPrompt({
         title: assignment.title,
         subject: assignment.subject,
@@ -45,7 +47,7 @@ const processAssignment = async (job: Job<JobPayload>): Promise<void> => {
         materialContext
     });
     console.info(`${logPrefix} calling AI (gemini/${env.AI_MODEL})`);
-    const aiResponse = await generateFromAI(systemPrompt, userPrompt);
+    const aiResponse = await generateFromAI(systemPrompt, userPrompt, fileParts);
     const jsonStr = extractJSON(aiResponse.raw);
     let parsed: unknown;
     try {
